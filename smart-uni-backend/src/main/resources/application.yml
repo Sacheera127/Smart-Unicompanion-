@@ -1,0 +1,19 @@
+spring:
+  data:
+    mongodb:
+      uri:
+      auto-index-creation: true
+  servlet:
+    multipart:
+      max-file-size: 20MB
+      max-request-size: 20MB
+
+server:
+  port: ${PORT:8080}
+
+app:
+  jwtSecret:
+  jwtExpirationMs:
+  uploadDir: uploads/
+  imgbb:
+    key:
