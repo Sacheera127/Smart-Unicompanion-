@@ -13,7 +13,7 @@ server:
 
 app:
   jwtSecret:
-  jwtExpirationMs:
+  jwtExpirationMs: 86400000
   uploadDir: uploads/
   imgbb:
     key:
