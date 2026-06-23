@@ -10,7 +10,7 @@ import java.util.List;
 public interface PostRepository extends MongoRepository<Post, String> {
     List<Post> findByUniversityAndStatus(String university, String status);
 
-    @org.springframework.data.mongodb.repository.Query()
+    @org.springframework.data.mongodb.repository.Query("{ 'university': ?0, 'status': ?1, 'category': { $regex: ?2, $options: 'i' } }")
     List<Post> findByUniversityAndStatusAndCategory(String university, String status, String category);
 
     List<Post> findByPostedById(String id);
