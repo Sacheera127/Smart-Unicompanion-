@@ -41,4 +41,127 @@ const ALL_UNIVERSITIES = [
   { name: "SLTC Research University",                      short: "SLTC",   type: "private", admins: 0, students: 21  },
 ];
 
+export default function AdminManagement() {
+  const { show, ToastEl } = useToast();
 
+  const [activeTab, setActiveTab] = useState("pending"); // "pending" | "active"
+  
+  // Data State
+  const [admins, setAdmins] = useState([]);
+  const [requests, setRequests] = useState([]);
+  
+  const [loading, setLoading] = useState(true);
+  const [actionLoading, setActionLoading] = useState("");
+  const [search, setSearch] = useState("");
+  
+  // Modals & Details
+  const [selectedAdmin, setSelectedAdmin] = useState(null);
+  const [activities, setActivities] = useState(null);
+  const [loadingActivities, setLoadingActivities] = useState(false);
+  const [idCardModal, setIdCardModal] = useState(null);
+  const [confirmModal, setConfirmModal] = useState({ isOpen: false });
+
+  const loadData = async () => {
+    setLoading(true);
+    const [reqRes, adminsRes] = await Promise.all([
+      getAdminRequests(),
+      getActiveAdmins()
+    ]);
+    setLoading(false);
+    
+    if (reqRes.success && reqRes.data) {
+      setRequests(reqRes.data.filter(r => r.status === "PENDING"));
+    }
+    if (adminsRes.success && adminsRes.data) {
+      setAdmins(adminsRes.data);
+    }
+  };
+
+  useEffect(() => {
+    loadData();
+  }, []);
+
+  // ── Actions ──
+  const handleApprove = async (id, name) => {
+    setActionLoading(id);
+    const res = await approveAdminRequest(id);
+    setActionLoading("");
+    if (!res.success) { show(res.message, "error"); return; }
+    setRequests((prev) => prev.filter((r) => r.id !== id));
+    show(`${name}'s admin access has been approved.`, "success");
+    loadData(); // refresh lists
+  };
+
+  const handleDecline = (id, name) => {
+    setRequests((prev) => prev.filter((r) => r.id !== id));
+    show(`${name}'s admin request has been declined.`, "info");
+  };
+
+  const handleAdminClick = async (admin) => {
+    setSelectedAdmin(admin);
+    setActivities(null);
+    setLoadingActivities(true);
+    const res = await getAdminActivities(admin.id || admin._id);
+    setLoadingActivities(false);
+    if (res.success) {
+      setActivities(res.data);
+    }
+  };
+
+  const handleDowngrade = async (id, name) => {
+    setConfirmModal({
+      isOpen: true,
+      title: "Downgrade Admin",
+      message: `Are you sure you want to downgrade ${name || 'this user'} to a student?`,
+      confirmText: "Downgrade",
+      variant: "secondary",
+      onConfirm: async () => {
+        setConfirmModal((prev) => ({ ...prev, loading: true }));
+        const res = await downgradeAdmin(id);
+        if (!res.success) { 
+          show(res.message, "error"); 
+          setConfirmModal({ isOpen: false }); 
+          return; 
+        }
+        setAdmins((prev) => prev.filter((a) => (a.id || a._id) !== id));
+        setSelectedAdmin(null);
+        show(`${name || 'User'} has been downgraded to a student.`, "success");
+        setConfirmModal({ isOpen: false });
+      }
+    });
+  };
+
+  const handleDeleteAdmin = async (id, name) => {
+    setConfirmModal({
+      isOpen: true,
+      title: "Delete Account",
+      message: `Are you sure you want to completely delete ${name || 'this user'}'s account? This action cannot be undone.`,
+      confirmText: "Delete",
+      variant: "danger",
+      onConfirm: async () => {
+        setConfirmModal((prev) => ({ ...prev, loading: true }));
+        const res = await deleteAdmin(id);
+        if (!res.success) { 
+          show(res.message, "error"); 
+          setConfirmModal({ isOpen: false }); 
+          return; 
+        }
+        setAdmins((prev) => prev.filter((a) => (a.id || a._id) !== id));
+        setSelectedAdmin(null);
+        show(`${name || 'User'}'s account has been completely deleted.`, "success");
+        setConfirmModal({ isOpen: false });
+      }
+    });
+  };
+
+  // ── Filters ──
+  const filteredAdmins = admins.filter(a => {
+    const term = search.toLowerCase();
+    return (a.name?.toLowerCase().includes(term) || a.email?.toLowerCase().includes(term) || a.university?.toLowerCase().includes(term));
+  });
+
+  const typeColor = (type) => type === "state"
+    ? { color: "#1E40AF", bg: "#EFF6FF", border: "#BFDBFE", label: "State" }
+    : { color: "#6B21A8", bg: "#FAF5FF", border: "#DDD6FE", label: "Private" };
+
+}
