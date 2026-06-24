@@ -74,3 +74,53 @@ export default function Transport() {
     if (search && !r.name.toLowerCase().includes(search.toLowerCase()) && !r.from.toLowerCase().includes(search.toLowerCase()) && !r.to.toLowerCase().includes(search.toLowerCase())) return false;
     return true;
   });
+
+  return (
+    <div className="max-w-5xl mx-auto">
+      {ToastEl}
+      <PageHeader title="Transport Timetables" subtitle="Verified bus and train schedules connecting to your campus" />
+
+      {/* ── Filters ── */}
+      <div className="flex flex-col sm:flex-row gap-3 mb-8">
+        <div className="flex-1 flex items-center gap-2 bg-card border border-border rounded-xl px-4 py-1 shadow-sm focus-within:border-emerald-500 focus-within:ring-2 focus-within:ring-emerald-500/20 transition-all">
+          <SearchIcon size={16} className="text-slate-400" />
+          <input 
+            value={search} 
+            onChange={(e) => setSearch(e.target.value)} 
+            placeholder="Search by route or destination..."
+            className="flex-1 bg-transparent border-none outline-none text-sm text-foreground py-2.5 w-full"
+          />
+          {search && (
+            <button onClick={() => setSearch("")} className="p-1 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors">
+              <XIcon size={14} />
+            </button>
+          )}
+        </div>
+        
+        <div className="flex gap-2 w-full sm:w-auto">
+          {["Bus", "Train"].map((t) => (
+            <button 
+              key={t} 
+              onClick={() => setTypeFilter(typeFilter === t ? "" : t)}
+              className={`flex-1 sm:flex-none px-6 py-2.5 rounded-xl text-sm font-bold transition-all border ${
+                typeFilter === t 
+                  ? 'bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 border-emerald-500 shadow-sm' 
+                  : 'bg-card text-slate-500 border-border hover:border-emerald-300 hover:text-emerald-500'
+              }`}
+            >
+              {t}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {loading && <LoadingScreen message="Finding transport routes..." />}
+
+      {!loading && filtered.length === 0 && (
+        <EmptyState 
+          icon={<BusIcon size={48} />} 
+          title="No routes found" 
+          description="Try a different search term or remove the type filter." 
+          action={<button className="mt-4 bg-emerald-50 text-emerald-600 px-5 py-2 rounded-xl font-bold hover:bg-emerald-100 transition-colors" onClick={() => { setSearch(""); setTypeFilter(""); }}>Clear filters</button>} 
+        />
+      )}
