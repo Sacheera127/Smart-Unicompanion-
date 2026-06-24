@@ -234,3 +234,116 @@ export default function Food() {
           })}
         </div>
       )}
+
+      {/* ── Detail Modal ── */}
+      {selected && (
+        <>
+          <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-[100] animate-fadeIn" />
+          
+          <div className="fixed inset-0 z-[101] overflow-y-auto py-10 px-4 flex justify-center items-start" onClick={() => setSelected(null)}>
+            <div className="w-full max-w-lg bg-card rounded-[28px] overflow-hidden shadow-[0_24px_64px_rgba(0,0,0,0.25)] border border-border animate-slideDown relative" onClick={e => e.stopPropagation()}>
+              
+              <div className="h-48 relative bg-cyan-500 overflow-hidden shrink-0">
+                {selected.images && selected.images.length > 0 ? (
+                  <img src={selected.images[0]} alt={selected.title} className="w-full h-full object-cover" />
+                ) : (
+                  <div className="absolute inset-0 flex items-center justify-center bg-black/10">
+                    <div className="w-20 h-20 rounded-full bg-black/20 backdrop-blur-md flex items-center justify-center">
+                      <FoodIcon size={40} className="text-white" />
+                    </div>
+                  </div>
+                )}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent" />
+
+                {getRating(selected) > 0 && (
+                  <div className="absolute bottom-4 right-4 bg-black/60 backdrop-blur-md rounded-full px-4 py-1.5 flex items-center gap-2">
+                    <svg width={14} height={14} viewBox="0 0 24 24" fill="#F59E0B" stroke="#F59E0B" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" /></svg>
+                    <span className="text-sm font-bold text-white">{Number(getRating(selected)).toFixed(1)}</span>
+                    <span className="text-xs text-white/70">({getCount(selected)} reviews)</span>
+                  </div>
+                )}
+              </div>
+
+              <div className="p-6 md:p-8">
+                <div className="flex justify-between items-start mb-3">
+                  <h2 className="text-xl font-black text-foreground max-w-[80%] leading-tight">{selected.title}</h2>
+                  <button onClick={() => setSelected(null)} className="p-2 bg-slate-100 dark:bg-slate-800 text-slate-500 rounded-xl hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors">
+                    <XIcon size={16} />
+                  </button>
+                </div>
+                
+                <div className="mb-4 flex items-center gap-2">
+                  <StarRating rating={getRating(selected)} size={18} />
+                  <span className="text-sm font-semibold text-slate-500">({getCount(selected)} reviews)</span>
+                </div>
+                
+                <p className="text-sm text-slate-600 dark:text-slate-300 leading-relaxed mb-6">
+                  {selected.description}
+                </p>
+                
+                <div className="grid grid-cols-2 gap-3 mb-6">
+                  {[
+                    ["Price Range", selected.priceRange], 
+                    ["Open Hours", selected.openHours], 
+                    ["Area", selected.area], 
+                    ["Dietary", (selected.tags || []).join(", ")]
+                  ].map(([k, v]) => (
+                    <div key={k} className="bg-slate-50 dark:bg-slate-800/50 rounded-xl p-3 border border-slate-100 dark:border-slate-800">
+                      <div className="text-[10.5px] text-slate-500 font-bold uppercase tracking-wider mb-1">{k}</div>
+                      <div className="text-sm font-bold text-foreground truncate">{v}</div>
+                    </div>
+                  ))}
+                </div>
+
+                <div className="rounded-2xl overflow-hidden border border-border mb-6 shadow-sm">
+                  <iframe 
+                    title="map"
+                    width="100%" 
+                    height="180" 
+                    className="block"
+                    loading="lazy" 
+                    allowFullScreen 
+                    referrerPolicy="no-referrer-when-downgrade" 
+                    src={`https://maps.google.com/maps?q=${encodeURIComponent(`${selected.title}, ${selected.area}, ${user?.university || ""}`)}&t=m&z=15&output=embed&iwloc=near`}
+                  />
+                </div>
+
+                <div className="flex flex-col sm:flex-row gap-3">
+                  <button onClick={() => { setRatingPost(selected); setSelected(null); }} className="flex-1 bg-gradient-to-br from-orange-400 to-orange-600 hover:from-orange-500 hover:to-orange-700 text-white font-bold py-3 px-4 rounded-xl shadow-[0_4px_14px_rgba(234,88,12,0.39)] transition-all hover:-translate-y-0.5 flex items-center justify-center gap-2">
+                    <svg width={16} height={16} viewBox="0 0 24 24" fill="#FFD700" stroke="#FFD700" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" /></svg>
+                    Rate & Reviews
+                  </button>
+                  {user && (user.isAdmin || user.role === "ROLE_MASTER_ADMIN") && (
+                    <button onClick={() => handleDelete(selected.id || selected._id)} className="bg-red-50 hover:bg-red-100 dark:bg-red-900/20 dark:hover:bg-red-900/40 text-red-600 font-bold py-3 px-4 rounded-xl flex items-center justify-center transition-all">
+                      <XIcon size={16} />
+                    </button>
+                  )}
+                  <button onClick={() => { setReportPostData(selected); setSelected(null); }} className="bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 font-bold py-3 px-4 rounded-xl flex items-center justify-center transition-all">
+                    <FlagIcon size={16} />
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </>
+      )}
+
+      {/* ── Rating Modal ── */}
+      {ratingPost && (
+        <RatingModal
+          post={ratingPost}
+          gradient={foodGradients[ratingIdx % foodGradients.length]}
+          onClose={() => setRatingPost(null)}
+          onRated={(data) => { handleRated(ratingPost, data); setRatingPost(null); }}
+        />
+      )}
+      {/* ── Report Modal ── */}
+      <ReportModal
+        isOpen={!!reportPostData}
+        onClose={() => setReportPostData(null)}
+        onSubmit={handleReport}
+        isSubmitting={isReporting}
+      />
+    </div>
+  );
+}
