@@ -45,4 +45,58 @@ function CircularMeter({ value, max, label, color, Icon }) {
   );
 }
 
+export default function AdminDesk() {
+  const { user } = useAuth();
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  
+  const [stats, setStats] = useState({
+    total: 0,
+    boardings: 0,
+    food: 0,
+    transport: 0,
+    reports: 0,
+    pending: 0,
+    active: 0
+  });
 
+  const load = async () => {
+    setLoading(true);
+    setError("");
+    const [pendingRes, activeRes, reportsRes] = await Promise.all([
+      getPendingPosts(user?.university),
+      getActivePosts(user?.university),
+      getAdminReports(user?.university),
+    ]);
+    setLoading(false);
+
+    let allPosts = [];
+    let pendingCount = 0;
+    let activeCount = 0;
+
+    if (pendingRes.success && pendingRes.data) {
+       allPosts = [...allPosts, ...pendingRes.data];
+       pendingCount = pendingRes.data.length;
+    }
+    if (activeRes.success && activeRes.data) {
+       allPosts = [...allPosts, ...activeRes.data];
+       activeCount = activeRes.data.length;
+    }
+
+    setStats({
+      total: allPosts.length,
+      boardings: allPosts.filter((p) => p.category === "BOARDING").length,
+      food: allPosts.filter((p) => p.category === "FOOD").length,
+      transport: allPosts.filter((p) => p.category === "TRANSPORT").length,
+      reports: reportsRes.success && reportsRes.data ? reportsRes.data.length : 0,
+      pending: pendingCount,
+      active: activeCount
+    });
+  };
+
+  useEffect(() => {
+    load();
+  }, []);
+
+  
+}
