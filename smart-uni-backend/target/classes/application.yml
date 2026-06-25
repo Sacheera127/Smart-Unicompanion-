@@ -1,0 +1,19 @@
+spring:
+  data:
+    mongodb:
+      uri: ${MONGODB_URI:mongodb+srv://smartuni:50239191@cluster0.mfhinwv.mongodb.net/smartuni?retryWrites=true&w=majority&appName=Cluster0}
+      auto-index-creation: true
+  servlet:
+    multipart:
+      max-file-size: 20MB
+      max-request-size: 20MB
+
+server:
+  port: ${PORT:8080}
+
+app:
+  jwtSecret: ${JWT_SECRET:9d72b217a11d8c1c24fa2eb8f7e8a94b5e61d3f54d7e9b8f217c91a3e8b4e7a8}
+  jwtExpirationMs: 86400000
+  uploadDir: uploads/
+  imgbb:
+    key: ${IMGBB_API_KEY:}
