@@ -98,5 +98,69 @@ export default function AdminDesk() {
     load();
   }, []);
 
-  
+  return (
+    <div>
+      <PageHeader
+        title="Admin Overview"
+        subtitle={`Dashboard metrics for ${user?.university || "your campus"}`}
+      />
+
+      {loading && <LoadingScreen message="Loading dashboard metrics..." />}
+      {error && <ErrorBox message={error} onRetry={load} />}
+
+      {!loading && !error && (
+        <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
+          {/* Top High-level Stats */}
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 16 }}>
+            <Card style={{ padding: 24, background: "linear-gradient(135deg, #2563EB, #3B82F6)", color: "white" }}>
+              <div style={{ fontSize: 13, fontWeight: 600, color: "rgba(255,255,255,0.8)", marginBottom: 8 }}>Total Listings</div>
+              <div style={{ fontSize: 36, fontWeight: 800 }}>{stats.total}</div>
+            </Card>
+            <Card style={{ padding: 24, background: "linear-gradient(135deg, #16A34A, #22C55E)", color: "white" }}>
+              <div style={{ fontSize: 13, fontWeight: 600, color: "rgba(255,255,255,0.8)", marginBottom: 8 }}>Active Listings</div>
+              <div style={{ fontSize: 36, fontWeight: 800 }}>{stats.active}</div>
+            </Card>
+            <Card style={{ padding: 24, background: "linear-gradient(135deg, #D97706, #F59E0B)", color: "white" }}>
+              <div style={{ fontSize: 13, fontWeight: 600, color: "rgba(255,255,255,0.8)", marginBottom: 8 }}>Pending Review</div>
+              <div style={{ fontSize: 36, fontWeight: 800 }}>{stats.pending}</div>
+            </Card>
+          </div>
+
+          <h3 style={{ fontSize: 18, fontWeight: 800, color: "#0F172A", marginTop: 8 }}>Listing Categories Breakdown</h3>
+          
+          {/* Circular Meters */}
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 16 }}>
+            <CircularMeter 
+               value={stats.boardings} 
+               max={stats.total} 
+               label="Boardings" 
+               color="#2563EB" 
+               Icon={HouseIcon} 
+            />
+            <CircularMeter 
+               value={stats.food} 
+               max={stats.total} 
+               label="Food Spots" 
+               color="#EA580C" 
+               Icon={FoodIcon} 
+            />
+            <CircularMeter 
+               value={stats.transport} 
+               max={stats.total} 
+               label="Transport" 
+               color="#16A34A" 
+               Icon={BusIcon} 
+            />
+            <CircularMeter 
+               value={stats.reports} 
+               max={Math.max(stats.total, 10)} // Arbitrary max for reports so ring is scaled nicely
+               label="Pending Reports" 
+               color="#DC2626" 
+               Icon={FlagIcon} 
+            />
+          </div>
+        </div>
+      )}
+    </div>
+  );
 }
