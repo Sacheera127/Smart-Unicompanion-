@@ -114,19 +114,59 @@ const TEAM_MEMBERS = [
 ];
 
 export default function AboutPage() {
+    const fadeInUp = { hidden: { opacity: 0, y: 30 }, visible: { opacity: 1, y: 0 } };
+    const staggerContainer = { hidden: { opacity: 0 }, visible: { opacity: 1, transition: { staggerChildren: 0.1 } } };
+
     return (
-        <div style={{ padding: "20px", fontFamily: "Arial" }}>
+        <div className="min-h-screen bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-slate-50 font-sans selection:bg-primary-500 selection:text-white">
+            <PublicNavbar transparentOnTop={false} />
 
-            {/* About Section */}
-            <section>
-                <h1>About Us</h1>
-                <p>
-                    We help students find boarding places, food spots, and transport
-                    information easily.
-                </p>
+            {/* ── What is this / About Section ─────────────────────────────────────── */}
+            <section id="about" className="pt-32 pb-24 bg-white dark:bg-slate-800/50 border-b border-slate-200 dark:border-slate-800 relative z-10">
+                <div className="max-w-7xl mx-auto px-6">
+                    <motion.div
+                        initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-100px" }} variants={staggerContainer}
+                        className="grid md:grid-cols-2 gap-16 items-center"
+                    >
+                        <motion.div variants={fadeInUp}>
+                            <h1 className="text-5xl font-black mb-6 tracking-tight">What is our goal?</h1>
+                            <p className="text-lg text-slate-600 dark:text-slate-400 mb-6 leading-relaxed">
+                                Finding a good boarding place, knowing the best local food spots, and figuring out the quickest bus routes shouldn't be a hassle.
+                            </p>
+                            <p className="text-lg text-slate-600 dark:text-slate-400 mb-8 leading-relaxed">
+                                Unify centralizes this information. We empower senior students to act as Campus Admins, verifying and maintaining a pristine directory of resources specific to their university, ensuring new students have a seamless transition into campus life.
+                            </p>
+
+                            <div className="grid grid-cols-2 gap-6">
+                                <div className="p-6 bg-slate-50 dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800">
+                                    <BuildingIcon size={32} className="text-primary-500 mb-4" />
+                                    <div className="text-3xl font-black mb-1">31+</div>
+                                    <div className="text-sm font-semibold text-slate-500 uppercase tracking-wider">Universities</div>
+                                </div>
+                                <div className="p-6 bg-slate-50 dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800">
+                                    <MapPinIcon size={32} className="text-indigo-500 mb-4" />
+                                    <div className="text-3xl font-black mb-1">1000+</div>
+                                    <div className="text-sm font-semibold text-slate-500 uppercase tracking-wider">Local Listings</div>
+                                </div>
+                            </div>
+                        </motion.div>
+
+                        <motion.div variants={fadeInUp} className="relative">
+                            <div className="aspect-square rounded-3xl border border-white/50 dark:border-slate-700 shadow-2xl flex items-center justify-center relative overflow-hidden group">
+                                <img src="/campus_students.png" alt="University Students" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out" />
+                                <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent pointer-events-none"></div>
+
+                                <motion.div animate={{ y: [0, -15, 0] }} transition={{ repeat: Infinity, duration: 5, ease: "easeInOut" }} className="absolute top-8 right-8 p-3 bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm rounded-2xl shadow-xl border border-white/20">
+                                    <ShieldCheckIcon size={28} className="text-green-500" />
+                                </motion.div>
+                                <motion.div animate={{ y: [0, 15, 0] }} transition={{ repeat: Infinity, duration: 6, ease: "easeInOut", delay: 1 }} className="absolute bottom-8 left-8 p-3 bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm rounded-2xl shadow-xl border border-white/20">
+                                    <BuildingIcon size={28} className="text-indigo-500" />
+                                </motion.div>
+                            </div>
+                        </motion.div>
+                    </motion.div>
+                </div>
             </section>
-
-            <hr />
 
             {/* Team Section */}
             <section>
