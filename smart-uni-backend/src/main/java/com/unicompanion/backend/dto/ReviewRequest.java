@@ -1,24 +1,14 @@
 package com.unicompanion.backend.dto;
 
-public class ReportRequest {
-    private String reason;
-    private String message;
+public class ReviewRequest {
+    private Double rating;
+    private String comment;
 
-    public ReportRequest() {}
+    public ReviewRequest() {}
 
-    public String getReason() {
-        return reason;
-    }
-
-    public void setReason(String reason) {
-        this.reason = reason;
-    }
-
-    public String getMessage() {
-        return message;
-    }
-
-    public void setMessage(String message) {
-        this.message = message;
-    }
+    public Double getRating() { return rating; }
+    public void setRating(Double rating) { this.rating = rating; }
+    public String getComment() { return comment; }
+    public void setComment(String comment) { this.comment = comment; }
 }
+
