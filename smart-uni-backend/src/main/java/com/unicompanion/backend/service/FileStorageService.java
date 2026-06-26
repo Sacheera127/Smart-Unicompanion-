@@ -25,6 +25,27 @@ public class FileStorageService {
             RestTemplate restTemplate = new RestTemplate();
             String url = "https://api.imgbb.com/1/upload?key=" + imgbbApiKey;
 
+            // Convert MultipartFile to Base64 string for ImgBB API
+            String base64Image = Base64.getEncoder().encodeToString(file.getBytes());
 
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+
+            MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
+            body.add("image", base64Image);
+
+            HttpEntity<MultiValueMap<String, String>> requestEntity = new HttpEntity<>(body, headers);
+
+            ResponseEntity<Map> response = restTemplate.exchange(url, HttpMethod.POST, requestEntity, Map.class);
+
+            if (response.getStatusCode() == HttpStatus.OK && response.getBody() != null) {
+                Map<String, Object> data = (Map<String, Object>) response.getBody().get("data");
+                return (String) data.get("display_url");
+            } else {
+                throw new RuntimeException("ImgBB API upload failed");
+            }
+        } catch (Exception ex) {
+            throw new RuntimeException("Could not upload file to ImgBB. " + ex.getMessage(), ex);
+        }
     }
 }
