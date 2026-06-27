@@ -202,4 +202,13 @@ export default function Dashboard() {
                 </div>
             </div>
 
-        
+            {/* ── Stat row ── */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-10">
+                <StatCard label="Total Boardings" value={totalBoardings.length} sub="Available now" icon={HouseIcon} accentClass="text-primary-600" iconBgClass="bg-primary-50 dark:bg-primary-900/30 border-primary-200" featured delayClass="delay-[0ms]" />
+                <StatCard label="Food Spots"      value={totalFood.length}      sub="Near campus"   icon={FoodIcon}  accentClass="text-orange-500" iconBgClass="bg-orange-50 dark:bg-orange-900/30 border-orange-200" delayClass="delay-[75ms]" />
+                <StatCard label="Transport"       value={totalTransport.length} sub="Active routes" icon={BusIcon}   accentClass="text-green-600" iconBgClass="bg-green-50 dark:bg-green-900/30 border-green-200" delayClass="delay-[150ms]" />
+                <StatCard label="Total Listings"  value={posts.length}          sub="All categories"icon={MapPinIcon} accentClass="text-blue-500" iconBgClass="bg-blue-50 dark:bg-blue-900/30 border-blue-200" delayClass="delay-[225ms]" />
+            </div>
+
+            {loading && <LoadingScreen message="Loading listings near you..." />}
+            {error   && <ErrorBox message={error} onRetry={load} />}
