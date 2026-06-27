@@ -46,3 +46,49 @@ function CategoryCard({ to, label, sub, Icon, accentClass, bgClass, hoverBorderC
         </Link>
     );
 }
+
+/* ─── Listing mini card ──────────────────────────────────────────────────────── */
+function ListingCard({ item, gradientClass, type }) {
+    return (
+        <div className="bg-card border border-border rounded-[20px] overflow-hidden transition-all duration-300 hover:-translate-y-1.5 hover:shadow-glass-hover hover:border-primary-300 dark:hover:border-primary-700 group cursor-pointer">
+            <div className={`h-24 relative overflow-hidden ${gradientClass}`}>
+                <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                {item.genderType && (
+                    <span className="absolute top-2.5 left-2.5 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md text-[9.5px] font-black text-slate-800 dark:text-slate-200 px-2.5 py-1 rounded-full uppercase tracking-wider">
+            {item.genderType}
+          </span>
+                )}
+                {(item.verified || item.status === "APPROVED") && (
+                    <span className="absolute top-2.5 right-2.5 bg-gradient-to-br from-green-500 to-green-600 text-white text-[9px] font-bold px-2 py-1 rounded-full flex items-center gap-1 shadow-[0_2px_8px_rgba(22,163,74,0.4)]">
+            <ShieldCheckIcon size={10} className="text-white" /> Verified
+          </span>
+                )}
+            </div>
+            <div className="p-3.5">
+                <div className="text-sm font-bold text-slate-900 dark:text-slate-100 mb-2 truncate">
+                    {item.title}
+                </div>
+                {type === "boarding" ? (
+                    <div className="flex justify-between items-center">
+            <span className="text-sm font-black text-primary-600 dark:text-primary-400">
+              Rs. {(item.price || 8500).toLocaleString()}
+                <span className="text-[10px] font-medium text-slate-500">/mo</span>
+            </span>
+                        <span className="text-[10.5px] text-slate-500 flex items-center gap-1">
+              <MapPinIcon size={11} className="text-slate-400" />{item.distance || "< 1 km"}
+            </span>
+                    </div>
+                ) : (
+                    <>
+                        <div className="flex gap-1.5 flex-wrap mb-2">
+                            {(item.tags || []).slice(0,3).map((t) => (
+                                <span key={t} className="text-[9.5px] font-bold bg-green-50 dark:bg-green-900/30 text-green-700 dark:text-green-400 px-2 py-0.5 rounded-full">{t}</span>
+                            ))}
+                        </div>
+                        <StarRating rating={item.rating || 4.5} size={12} />
+                    </>
+                )}
+            </div>
+        </div>
+    );
+}
