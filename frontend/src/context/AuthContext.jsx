@@ -19,3 +19,9 @@ function getSeenIds() {
 function saveSeenIds(set) {
     try { sessionStorage.setItem(SEEN_KEY, JSON.stringify([...set])); } catch {}
 }
+
+const CATEGORY_LABELS = {
+    BOARDING:  { emoji: "🏠", label: "New Boarding",  type: "info"    },
+    FOOD:      { emoji: "🍽️",  label: "New Food Spot", type: "success" },
+    TRANSPORT: { emoji: "🚌", label: "New Transport",  type: "info"    },
+};
