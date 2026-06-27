@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { useAuth } from "../context/AuthContext.jsx";
+import { useAuth } from "../context/AuthContext";
 import { useTheme } from "../context/ThemeContext";
 import { getActivePosts } from "../api/api";
 import { StarRating, LoadingScreen, ErrorBox } from "../components/ui";
@@ -92,6 +92,7 @@ function ListingCard({ item, gradientClass, type }) {
         </div>
     );
 }
+
 /* ─── Dashboard ──────────────────────────────────────────────────────────────── */
 export default function Dashboard() {
     const { user } = useAuth();
@@ -260,4 +261,3 @@ export default function Dashboard() {
         </div>
     );
 }
-
