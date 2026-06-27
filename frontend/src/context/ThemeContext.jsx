@@ -83,3 +83,35 @@ export const THEMES = {
         skeletonShimmer:  "var(--n700)",
     },
 };
+
+export function ThemeProvider({ children }) {
+    const [themeId, setThemeId] = useState(() => {
+        const s = localStorage.getItem("uc_theme");
+        return (s === "light" || s === "dark") ? s : "light";
+    });
+
+    const theme     = THEMES[themeId] || THEMES.light;
+    const setTheme  = (id) => {
+        if (id !== "light" && id !== "dark") return;
+        setThemeId(id);
+        localStorage.setItem("uc_theme", id);
+    };
+    const toggleTheme = () => setTheme(theme.dark ? "light" : "dark");
+
+    useEffect(() => {
+        document.body.style.background = theme.pageBg;
+        document.documentElement.style.setProperty("--accent",   theme.accent);
+        document.documentElement.style.setProperty("--page-bg",  theme.pageBg);
+        document.documentElement.style.setProperty("--pageBg",   theme.pageBg);
+        document.documentElement.style.setProperty("--sidebar",  theme.sidebar);
+        document.documentElement.style.setProperty("--card-bg",  theme.cardBg);
+        document.documentElement.setAttribute("data-theme", themeId);
+    }, [theme, themeId]);
+
+    return (
+        <ThemeContext.Provider value={{ theme, setTheme, toggleTheme, THEMES }}>
+            {children}
+        </ThemeContext.Provider>
+    );
+}
+
