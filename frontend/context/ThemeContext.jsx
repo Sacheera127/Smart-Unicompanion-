@@ -43,6 +43,45 @@ export const THEMES = {
         skeletonBase:     "var(--p100)",
         skeletonShimmer:  "var(--p200)",
     },
+    dark: {
+        id: "dark", name: "Dark", dark: true,
+        sidebar:          "linear-gradient(180deg, var(--n900) 0%, var(--p800) 50%, var(--p700) 100%)",
+        sidebarSolid:     "var(--n900)",
+        accent:           "var(--p400)",
+        accentHover:      "var(--p300)",
+        accentLight:      "var(--p200)",
+        accentBg:         "rgba(34,211,238,.1)",
+        accentBorder:     "rgba(34,211,238,.2)",
+        accentSoft:       "rgba(34,211,238,.15)",
+        accentGlow:       "rgba(34,211,238,.2)",
+        navActive:        "rgba(34,211,238,.22)",
+        navActiveText:    "var(--p200)",
+        navText:          "rgba(255,255,255,.45)",
+        navHover:         "rgba(255,255,255,.07)",
+        brandGrad:        "linear-gradient(135deg,var(--p500),var(--p300))",
+        avatarGrad:       "linear-gradient(135deg,var(--p500),#38BDF8)",
+        heroGrad:         "linear-gradient(135deg,var(--n900) 0%,var(--p800) 50%,var(--p700) 100%)",
+        pageBg:           "var(--n900)",
+        cardBg:           "rgba(15,23,42,.75)",
+        cardBorder:       "rgba(255,255,255,.1)",
+        cardBorderHover:  "rgba(255,255,255,.25)",
+        cardShadow:       "0 2px 12px rgba(0,0,0,.4)",
+        cardShadowHover:  "0 12px 36px rgba(0,0,0,.6)",
+        topbarBg:         "rgba(15,23,42,.85)",
+        topbarBorder:     "rgba(255,255,255,.1)",
+        topbarShadow:     "0 1px 24px rgba(0,0,0,.3)",
+        textPrimary:      "var(--n50)",
+        textSecondary:    "var(--p200)",
+        textMuted:        "var(--n400)",
+        textFaint:        "var(--n500)",
+        inputBg:          "var(--n800)",
+        inputBorder:      "rgba(255,255,255,.1)",
+        inputFocus:       "var(--p400)",
+        inputShadow:      "0 0 0 3px rgba(34,211,238,.15)",
+        divider:          "rgba(34,211,238,.08)",
+        skeletonBase:     "var(--n800)",
+        skeletonShimmer:  "var(--n700)",
+    },
 };
 
 export function ThemeProvider({ children }) {
@@ -67,6 +106,14 @@ export function ThemeProvider({ children }) {
         document.documentElement.style.setProperty("--sidebar",  theme.sidebar);
         document.documentElement.style.setProperty("--card-bg",  theme.cardBg);
         document.documentElement.setAttribute("data-theme", themeId);
-    }, [theme, themeId]);}
+    }, [theme, themeId]);
+
+    return (
+        <ThemeContext.Provider value={{ theme, setTheme, toggleTheme, THEMES }}>
+            {children}
+        </ThemeContext.Provider>
+    );
+}
+
 
 
