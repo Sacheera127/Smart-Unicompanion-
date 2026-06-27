@@ -90,6 +90,7 @@ export function AuthProvider({ children }) {
                 { withCredentials: true }
             );
 
+
             const posts = Array.isArray(res.data) ? res.data : [];
             const seenIds = getSeenIds();
 
@@ -151,4 +152,33 @@ export function AuthProvider({ children }) {
             if (pollRef.current) { clearInterval(pollRef.current); pollRef.current = null; }
         };
     }, [user, checkNewPosts]);
+
+    /* ── Update notification timestamps every minute (for "X min ago") ── */
+    useEffect(() => {
+        const t = setInterval(() => {
+            setNotifications(prev =>
+                prev.map(n => ({
+                    ...n,
+                    time: n.timestamp ? formatTime(new Date(n.timestamp)) : n.time,
+                }))
+            );
+        }, 60_000);
+        return () => clearInterval(t);
+    }, []);
+
+    const isStudent     = user?.role === "ROLE_STUDENT";
+    const isAdmin       = user?.role === "ROLE_ADMIN";
+    const isMasterAdmin = user?.role === "ROLE_MASTER_ADMIN";
+
+    return (
+        <AuthContext.Provider value={{
+            user, login, logout,
+            isStudent, isAdmin, isMasterAdmin,
+            notifications, unreadCount, markAllRead, markRead, dismissNotification,
+        }}>
+            {children}
+        </AuthContext.Provider>
+    );
+}
+
 
