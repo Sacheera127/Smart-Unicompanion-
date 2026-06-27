@@ -121,7 +121,7 @@ export default function AboutPage() {
         <div className="min-h-screen bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-slate-50 font-sans selection:bg-primary-500 selection:text-white">
             <PublicNavbar transparentOnTop={false} />
 
-            {/* ── What is this / About Section ─────────────────────────────────────── */}
+            // What is this / About Section
             <section id="about" className="pt-32 pb-24 bg-white dark:bg-slate-800/50 border-b border-slate-200 dark:border-slate-800 relative z-10">
                 <div className="max-w-7xl mx-auto px-6">
                     <motion.div
@@ -168,7 +168,7 @@ export default function AboutPage() {
                 </div>
             </section>
 
-            {/* Team Section */}
+            // Team Section
             <section>
                 <h2>Team Members</h2>
 
