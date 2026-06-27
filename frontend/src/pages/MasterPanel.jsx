@@ -41,3 +41,92 @@ const ALL_UNIVERSITIES = [
   { name: "SLTC Research University",                      short: "SLTC",   type: "private", admins: 0, students: 21  },
 ];
 
+function CircularMeter({ value, max, label, color, Icon }) {
+  const radius = 36;
+  const circumference = 2 * Math.PI * radius;
+  const strokeDashoffset = max === 0 ? circumference : circumference - (value / max) * circumference;
+
+  return (
+    <Card style={{ padding: "24px", display: "flex", flexDirection: "column", alignItems: "center", gap: 16 }}>
+      <div style={{ position: "relative", width: 90, height: 90, display: "flex", alignItems: "center", justifyContent: "center" }}>
+        <svg width="90" height="90" style={{ transform: "rotate(-90deg)", position: "absolute", top: 0, left: 0 }}>
+          {/* Background Ring */}
+          <circle
+            cx="45" cy="45" r={radius}
+            stroke="#F1F5F9"
+            strokeWidth="8"
+            fill="transparent"
+          />
+          {/* Progress Ring */}
+          <circle
+            cx="45" cy="45" r={radius}
+            stroke={color}
+            strokeWidth="8"
+            fill="transparent"
+            strokeDasharray={circumference}
+            strokeDashoffset={strokeDashoffset}
+            strokeLinecap="round"
+            style={{ transition: "stroke-dashoffset 1s ease-in-out" }}
+          />
+        </svg>
+        <div style={{ color: color }}>
+          <Icon size={24} />
+        </div>
+      </div>
+      <div style={{ textAlign: "center" }}>
+        <div style={{ fontSize: 24, fontWeight: 800, color: "#0F172A", lineHeight: 1 }}>{value.toLocaleString()}</div>
+        <div style={{ fontSize: 13, fontWeight: 600, color: "#64748B", marginTop: 4 }}>{label}</div>
+      </div>
+    </Card>
+  );
+}
+
+
+export default function MasterPanel() {
+  const { ToastEl } = useToast();
+  const [loading, setLoading]           = useState(true);
+  const [error, setError]               = useState("");
+  const [uniTab, setUniTab]             = useState("all");   // "all" | "state" | "private"
+  const [expandedUni, setExpandedUni]   = useState(null);
+
+  const [platformStats, setPlatformStats] = useState(null);
+  const [pendingRequests, setPendingRequests] = useState(0);
+
+  const load = async () => {
+    setLoading(true); setError("");
+    const [reqRes, statsRes] = await Promise.all([
+      getAdminRequests(),
+      getPlatformStats()
+    ]);
+    setLoading(false);
+    
+    if (reqRes.success && reqRes.data) { 
+      setPendingRequests(reqRes.data.filter(r => r.status === "PENDING").length); 
+    }
+    if (statsRes.success) {
+      setPlatformStats(statsRes.data);
+    }
+  };
+
+  useEffect(() => { load(); }, []);
+
+  const totalStudents  = platformStats?.totalStudents || 0;
+  const totalAdmins    = platformStats?.totalAdmins || 0;
+  const totalMasterAdmins = platformStats?.totalMasterAdmins || 1;
+  const totalUnis      = ALL_UNIVERSITIES.length;
+  const activeUnis     = platformStats?.activeUnis || 0;
+  const maxMetersVal   = Math.max(totalStudents, 50);
+
+  const visibleUnis = (uniTab === "state"   ? ALL_UNIVERSITIES.filter(u => u.type === "state")
+                    : uniTab === "private" ? ALL_UNIVERSITIES.filter(u => u.type === "private")
+                    : ALL_UNIVERSITIES).map(u => {
+                      const dynamic = platformStats?.universityStats?.[u.name];
+                      return { ...u, students: dynamic?.students || 0, admins: dynamic?.admins || 0 };
+                    });
+
+  const typeColor = (type) => type === "state"
+    ? { color: "#1E40AF", bg: "#EFF6FF", border: "#BFDBFE", label: "State" }
+    : { color: "#6B21A8", bg: "#FAF5FF", border: "#DDD6FE", label: "Private" };
+
+  
+}
