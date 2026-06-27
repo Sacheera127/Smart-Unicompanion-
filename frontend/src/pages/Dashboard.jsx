@@ -186,3 +186,18 @@ export default function Dashboard() {
                     ))}
                 </div>
             </div>
+
+            {/* ── Quick categories ── */}
+            <div className="mb-10">
+                <div className="flex justify-between items-center mb-5">
+                    <h2 className="text-lg font-black text-slate-900 dark:text-white tracking-tight">Explore</h2>
+                    <Link to="/map" className="text-xs font-bold text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-900/30 border border-primary-200 dark:border-primary-800 rounded-full px-3.5 py-1.5 flex items-center gap-1.5 hover:bg-primary-100 dark:hover:bg-primary-900/50 transition-colors">
+                        <MapIcon size={14} className="text-primary-600 dark:text-primary-400" /> View on map
+                    </Link>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <CategoryCard to="/boardings" label="Boardings"    sub={`${totalBoardings.length} verified listings`} Icon={HouseIcon} accentClass="text-primary-500" bgClass="bg-primary-50 dark:bg-primary-900/30 border-primary-200 dark:border-primary-800" hoverBorderClass="hover:border-primary-400" delayClass="delay-[0ms]" />
+                    <CategoryCard to="/food"      label="Food & Dining" sub={`${totalFood.length} spots near campus`}    Icon={FoodIcon}  accentClass="text-orange-500" bgClass="bg-orange-50 dark:bg-orange-900/30 border-orange-200 dark:border-orange-800" hoverBorderClass="hover:border-orange-400" delayClass="delay-[75ms]" />
+                    <CategoryCard to="/transport" label="Transport"     sub={`${totalTransport.length} live routes`}     Icon={BusIcon}   accentClass="text-green-500" bgClass="bg-green-50 dark:bg-green-900/30 border-green-200 dark:border-green-800" hoverBorderClass="hover:border-green-400" delayClass="delay-[150ms]" />
+                </div>
+            </div>
