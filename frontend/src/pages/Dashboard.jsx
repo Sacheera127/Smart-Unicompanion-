@@ -92,3 +92,48 @@ function ListingCard({ item, gradientClass, type }) {
         </div>
     );
 }
+/* ─── Dashboard ──────────────────────────────────────────────────────────────── */
+export default function Dashboard() {
+    const { user } = useAuth();
+    const { theme } = useTheme();
+    const [posts,   setPosts]   = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error,   setError]   = useState("");
+    const [time,    setTime]    = useState(new Date());
+
+    const load = async () => {
+        setLoading(true); setError("");
+        const res = await getActivePosts(user?.university || "University of Moratuwa");
+        setLoading(false);
+        if (!res.success) { setError(res.message); return; }
+        setPosts(res.data || []);
+    };
+
+    useEffect(() => { load(); }, []);
+    useEffect(() => { const t = setInterval(() => setTime(new Date()), 60000); return () => clearInterval(t); }, []);
+
+    const totalBoardings = posts.filter(p => p.category === "BOARDING");
+    const totalFood      = posts.filter(p => p.category === "FOOD");
+    const totalTransport = posts.filter(p => p.category === "TRANSPORT");
+    const displayBoardings = totalBoardings.slice(0, 4);
+    const displayFood      = totalFood.slice(0, 4);
+
+    const bGrads = [
+        "bg-gradient-to-br from-primary-200 to-primary-300",
+        "bg-gradient-to-br from-cyan-300 to-cyan-400",
+        "bg-gradient-to-br from-cyan-200 to-cyan-300",
+        "bg-gradient-to-br from-teal-200 to-teal-300",
+    ];
+    const fGrads = [
+        "bg-gradient-to-br from-green-200 to-green-300",
+        "bg-gradient-to-br from-orange-200 to-orange-300",
+        "bg-gradient-to-br from-amber-200 to-amber-300",
+        "bg-gradient-to-br from-pink-200 to-pink-300",
+    ];
+
+    const firstName = user?.name?.split(" ")[0] || "Student";
+    const hour = time.getHours();
+    const greeting = hour < 12 ? "Good morning" : hour < 17 ? "Good afternoon" : "Good evening";
+
+    return (
+        <div className="max-w-6xl mx-auto">
