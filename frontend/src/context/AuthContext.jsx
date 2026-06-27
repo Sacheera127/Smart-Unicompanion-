@@ -166,3 +166,17 @@ export function AuthProvider({ children }) {
         return () => clearInterval(t);
     }, []);
 
+    const isStudent     = user?.role === "ROLE_STUDENT";
+    const isAdmin       = user?.role === "ROLE_ADMIN";
+    const isMasterAdmin = user?.role === "ROLE_MASTER_ADMIN";
+
+    return (
+        <AuthContext.Provider value={{
+            user, login, logout,
+            isStudent, isAdmin, isMasterAdmin,
+            notifications, unreadCount, markAllRead, markRead, dismissNotification,
+        }}>
+            {children}
+        </AuthContext.Provider>
+    );
+}
