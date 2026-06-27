@@ -138,7 +138,7 @@ export default function Dashboard() {
 
     return (
         <div className="max-w-6xl mx-auto">
-            {/* Hero Banner */}
+            {/* ── Hero Banner ── */}
             <div className="relative overflow-hidden rounded-[28px] bg-gradient-to-br from-slate-900 to-slate-800 dark:from-slate-950 dark:to-slate-900 shadow-2xl min-h-[200px] mb-8 animate-fadeInUp p-8 md:p-10 flex flex-col md:flex-row md:items-center justify-between gap-8">
                 {/* Animated background blobs */}
                 <div className="absolute -top-20 -right-20 w-64 h-64 rounded-full bg-primary-500/20 blur-3xl mix-blend-screen animate-[float_6s_ease-in-out_infinite]" />
@@ -212,6 +212,7 @@ export default function Dashboard() {
 
             {loading && <LoadingScreen message="Loading listings near you..." />}
             {error   && <ErrorBox message={error} onRetry={load} />}
+
             {!loading && (
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
 
@@ -261,7 +262,3 @@ export default function Dashboard() {
         </div>
     );
 }
-
-
-
-
