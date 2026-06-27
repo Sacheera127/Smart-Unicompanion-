@@ -134,4 +134,21 @@ export function AuthProvider({ children }) {
         } catch (_) {
             // Silently ignore network errors during polling
         }
-    }, [])}
+    }, []);
+
+    /* ── Start / stop polling when user changes ── */
+    useEffect(() => {
+        if (!user) {
+            if (pollRef.current) { clearInterval(pollRef.current); pollRef.current = null; }
+            return;
+        }
+
+        // Run immediately, then every 30 seconds
+        checkNewPosts(user);
+        pollRef.current = setInterval(() => checkNewPosts(user), 30_000);
+
+        return () => {
+            if (pollRef.current) { clearInterval(pollRef.current); pollRef.current = null; }
+        };
+    }, [user, checkNewPosts]);
+
