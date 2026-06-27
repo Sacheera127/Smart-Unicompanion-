@@ -9,7 +9,7 @@ export const useAuth = () => useContext(AuthContext);
 
 const BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:8080";
 
-/* ─── Helpers ─────────────────────────────────────────────────────────────────*/
+/* Helpers */
 const SEEN_KEY = "uc_seen_posts"; // sessionStorage key for known post IDs
 
 function getSeenIds() {
@@ -35,7 +35,7 @@ function formatTime(date) {
     return date.toLocaleDateString("en-GB", { day: "numeric", month: "short" });
 }
 
-/* ─── Provider ────────────────────────────────────────────────────────────────*/
+/* Provider */
 export function AuthProvider({ children }) {
 
     const [user,  setUser]  = useState(() => {
