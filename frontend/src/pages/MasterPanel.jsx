@@ -4,7 +4,6 @@ import { PageHeader, Card, LoadingScreen, ErrorBox } from "../components/ui";
 import { useToast } from "../components/Toast";
 import { BuildingIcon, UserIcon, ShieldCheckIcon, TrendingUpIcon } from "../components/Icons";
 
-// ─── All universities on the platform ────────────────────────────────────────
 const ALL_UNIVERSITIES = [
   // State
   { name: "University of Moratuwa",                        short: "UOM",    type: "state",   admins: 2, students: 312 },
