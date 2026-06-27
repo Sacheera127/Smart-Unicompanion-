@@ -92,3 +92,61 @@ export default function MapView() {
     FOOD:      posts.filter((p) => p.type === "FOOD").length,
     TRANSPORT: posts.filter((p) => p.type === "TRANSPORT").length,
   };
+
+  return (
+    <div style={{ display: "flex", flexDirection: "column", height: "100%", gap: 0 }}>
+      {/* ── Header ── */}
+      <PageHeader
+        title="Campus Map"
+        subtitle={`Live listings around ${user?.area || "your campus"} · ${filtered.length} showing`}
+        action={
+          <div style={{ display: "flex", gap: 6, background: "#F1F5F9", borderRadius: 10, padding: 3 }}>
+            {[{ v: "map", label: "Map", Icon: MapIcon }, { v: "list", label: "List", Icon: ListIcon }].map(({ v, label, Icon }) => (
+              <button key={v} onClick={() => setView(v)}
+                style={{ display: "flex", alignItems: "center", gap: 6, padding: "7px 16px", borderRadius: 8, border: "none", background: view === v ? "#fff" : "transparent", color: view === v ? "#0F172A" : "#64748B", fontWeight: 600, fontSize: 12.5, cursor: "pointer", boxShadow: view === v ? "0 1px 4px rgba(0,0,0,0.08)" : "none", transition: "all 0.15s" }}>
+                <Icon size={13} /> {label}
+              </button>
+            ))}
+          </div>
+        }
+      />
+
+      {/* ── Search + Filter toolbar ── */}
+      <div style={{ display: "flex", gap: 10, marginBottom: 16, flexWrap: "wrap", alignItems: "center" }}>
+        {/* Search box */}
+        <div style={{ flex: 1, minWidth: 200, display: "flex", alignItems: "center", gap: 8, background: "#fff", border: "1.5px solid #E2E8F0", borderRadius: 10, padding: "0 14px" }}>
+          <SearchIcon size={14} color="#94A3B8" />
+          <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search listings on map..."
+            style={{ flex: 1, border: "none", outline: "none", fontSize: 13, padding: "9px 0", background: "transparent", color: "#0F172A" }} />
+          {search && <button onClick={() => setSearch("")} style={{ background: "none", border: "none", color: "#94A3B8", display: "flex", cursor: "pointer" }}><XIcon size={13} /></button>}
+        </div>
+
+        {/* Type filters */}
+        {Object.entries(TYPE_LABELS).map(([type, label]) => {
+          const Icon = TYPE_ICONS[type];
+          const color = TYPE_COLORS[type];
+          const active = activeType === type;
+          return (
+            <button key={type} onClick={() => setActiveType(active ? "" : type)}
+              style={{ display: "flex", alignItems: "center", gap: 6, padding: "8px 16px", borderRadius: 20, border: `1.5px solid ${active ? color : "#E2E8F0"}`, background: active ? color + "14" : "#fff", color: active ? color : "#64748B", fontWeight: 600, fontSize: 12.5, cursor: "pointer", transition: "all 0.18s" }}>
+              <Icon size={13} color={active ? color : "#94A3B8"} />
+              {label}
+              <span style={{ fontSize: 10.5, background: active ? color + "25" : "#F1F5F9", color: active ? color : "#94A3B8", padding: "1px 7px", borderRadius: 99, fontWeight: 700 }}>
+                {counts[type]}
+              </span>
+            </button>
+          );
+        })}
+        {activeType && (
+          <button onClick={() => setActiveType("")}
+            style={{ padding: "8px 14px", borderRadius: 20, border: "1.5px solid #E2E8F0", background: "#fff", color: "#64748B", fontSize: 12.5, fontWeight: 600, cursor: "pointer" }}>
+            Clear
+          </button>
+        )}
+      </div>
+
+      {loading && <LoadingScreen message="Loading listings near you..." />}
+      {error && <ErrorBox message={error} />}
+
+      {!loading && view === "map" && (
+        <div style={{ display: "flex", flexDirection: "row", gap: 16, flex: 1, minHeight: 0 }}>
