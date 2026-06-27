@@ -27,7 +27,7 @@ function StatCard({ label, value, sub, icon: Icon, accentClass, iconBgClass, fea
     );
 }
 
-/* Category card  */
+/* Category card */
 function CategoryCard({ to, label, sub, Icon, accentClass, bgClass, hoverBorderClass, delayClass = "" }) {
     return (
         <Link to={to} className={`block group animate-fadeInUp ${delayClass}`}>
@@ -138,7 +138,7 @@ export default function Dashboard() {
 
     return (
         <div className="max-w-6xl mx-auto">
-            {/* ── Hero Banner ── */}
+            {/* Hero Banner */}
             <div className="relative overflow-hidden rounded-[28px] bg-gradient-to-br from-slate-900 to-slate-800 dark:from-slate-950 dark:to-slate-900 shadow-2xl min-h-[200px] mb-8 animate-fadeInUp p-8 md:p-10 flex flex-col md:flex-row md:items-center justify-between gap-8">
                 {/* Animated background blobs */}
                 <div className="absolute -top-20 -right-20 w-64 h-64 rounded-full bg-primary-500/20 blur-3xl mix-blend-screen animate-[float_6s_ease-in-out_infinite]" />
@@ -187,7 +187,7 @@ export default function Dashboard() {
                 </div>
             </div>
 
-            {/* ── Quick categories ── */}
+            {/* Quick categories */}
             <div className="mb-10">
                 <div className="flex justify-between items-center mb-5">
                     <h2 className="text-lg font-black text-slate-900 dark:text-white tracking-tight">Explore</h2>
@@ -202,7 +202,7 @@ export default function Dashboard() {
                 </div>
             </div>
 
-            {/* ── Stat row ── */}
+            {/* Stat row */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-10">
                 <StatCard label="Total Boardings" value={totalBoardings.length} sub="Available now" icon={HouseIcon} accentClass="text-primary-600" iconBgClass="bg-primary-50 dark:bg-primary-900/30 border-primary-200" featured delayClass="delay-[0ms]" />
                 <StatCard label="Food Spots"      value={totalFood.length}      sub="Near campus"   icon={FoodIcon}  accentClass="text-orange-500" iconBgClass="bg-orange-50 dark:bg-orange-900/30 border-orange-200" delayClass="delay-[75ms]" />
@@ -214,4 +214,54 @@ export default function Dashboard() {
             {error   && <ErrorBox message={error} onRetry={load} />}
             {!loading && (
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+
+                    {/* Trending Boardings */}
+                    <div>
+                        <div className="flex justify-between items-center mb-5">
+                            <h2 className="text-base font-black text-slate-900 dark:text-white flex items-center gap-2">
+                <span className="w-8 h-8 rounded-lg bg-primary-50 dark:bg-primary-900/30 border border-primary-200 dark:border-primary-800 flex items-center justify-center">
+                  <TrendingUpIcon size={16} className="text-primary-600 dark:text-primary-400" />
+                </span>
+                                Trending Boardings
+                            </h2>
+                            <Link to="/boardings" className="text-xs font-bold text-primary-600 dark:text-primary-400 flex items-center gap-1 hover:underline">
+                                See all <ChevronRightIcon size={14} />
+                            </Link>
+                        </div>
+                        <div className="grid grid-cols-2 gap-3 md:gap-4">
+                            {displayBoardings.length > 0
+                                ? displayBoardings.map((b, i) => <ListingCard key={b._id} item={b} gradientClass={bGrads[i % 4]} type="boarding" />)
+                                : [0,1,2,3].map(i => <div key={i} className={`h-40 rounded-[20px] opacity-40 animate-pulse ${bGrads[i]}`} />)
+                            }
+                        </div>
+                    </div>
+
+                    {/* Trending Food */}
+                    <div>
+                        <div className="flex justify-between items-center mb-5">
+                            <h2 className="text-base font-black text-slate-900 dark:text-white flex items-center gap-2">
+                <span className="w-8 h-8 rounded-lg bg-orange-50 dark:bg-orange-900/30 border border-orange-200 dark:border-orange-800 flex items-center justify-center">
+                  <TrendingUpIcon size={16} className="text-orange-500 dark:text-orange-400" />
+                </span>
+                                Trending Food
+                            </h2>
+                            <Link to="/food" className="text-xs font-bold text-primary-600 dark:text-primary-400 flex items-center gap-1 hover:underline">
+                                See all <ChevronRightIcon size={14} />
+                            </Link>
+                        </div>
+                        <div className="grid grid-cols-2 gap-3 md:gap-4">
+                            {displayFood.length > 0
+                                ? displayFood.map((f, i) => <ListingCard key={f._id} item={f} gradientClass={fGrads[i % 4]} type="food" />)
+                                : [0,1,2,3].map(i => <div key={i} className={`h-40 rounded-[20px] opacity-40 animate-pulse ${fGrads[i]}`} />)
+                            }
+                        </div>
+                    </div>
+                </div>
+            )}
+        </div>
+    );
+}
+
+
+
 
