@@ -25,6 +25,7 @@ const CATEGORY_LABELS = {
     FOOD:      { emoji: "🍽️",  label: "New Food Spot", type: "success" },
     TRANSPORT: { emoji: "🚌", label: "New Transport",  type: "info"    },
 };
+
 function formatTime(date) {
     const now = new Date();
     const diff = Math.floor((now - date) / 60000);
@@ -89,7 +90,6 @@ export function AuthProvider({ children }) {
                 `${BASE_URL}/api/posts/active/${encodeURIComponent(currentUser.university)}`,
                 { withCredentials: true }
             );
-
 
             const posts = Array.isArray(res.data) ? res.data : [];
             const seenIds = getSeenIds();
@@ -180,5 +180,3 @@ export function AuthProvider({ children }) {
         </AuthContext.Provider>
     );
 }
-
-
