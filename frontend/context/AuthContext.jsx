@@ -77,4 +77,61 @@ export function AuthProvider({ children }) {
     const dismissNotification = useCallback((id) =>
         setNotifications(prev => prev.filter(n => n.id !== id)), []);
 
-    const unreadCount = notifications.filter(n => !n.read).length;}
+    const unreadCount = notifications.filter(n => !n.read).length;
+
+
+    /* ── Poll for new posts ── */
+    const checkNewPosts = useCallback(async (currentUser) => {
+        if (!currentUser?.university) return;
+
+        try {
+            const res = await axios.get(
+                `${BASE_URL}/api/posts/active/${encodeURIComponent(currentUser.university)}`,
+                { withCredentials: true }
+            );
+
+            const posts = Array.isArray(res.data) ? res.data : [];
+            const seenIds = getSeenIds();
+
+            if (firstPoll.current) {
+                // On the very first poll after login: just baseline all current posts as "seen"
+                // so we don't spam the user with every existing listing
+                posts.forEach(p => seenIds.add(p._id || p.id));
+                saveSeenIds(seenIds);
+                firstPoll.current = false;
+                return;
+            }
+
+            // On subsequent polls: find posts we've never seen
+            const newPosts = posts.filter(p => !seenIds.has(p._id || p.id));
+
+            if (newPosts.length > 0) {
+                const newNotifs = newPosts.map(p => {
+                    const cat = CATEGORY_LABELS[p.category] || { emoji: "📌", label: "New Listing", type: "info" };
+                    const now = new Date();
+                    return {
+                        id: `notif_${p._id || p.id}_${now.getTime()}`,
+                        postId: p._id || p.id,
+                        type: cat.type,
+                        title: `${cat.emoji} ${cat.label} — ${p.title}`,
+                        body:  `Posted near ${p.area || currentUser.area || "your campus"} · ${currentUser.university}`,
+                        time:  formatTime(now),
+                        timestamp: now,
+                        read: false,
+                    };
+                });
+
+                setNotifications(prev => {
+                    // Prepend new notifications, cap at 50 total
+                    const merged = [...newNotifs, ...prev].slice(0, 50);
+                    return merged;
+                });
+
+                // Mark all new posts as seen
+                newPosts.forEach(p => seenIds.add(p._id || p.id));
+                saveSeenIds(seenIds);
+            }
+        } catch (_) {
+            // Silently ignore network errors during polling
+        }
+    }, [])}
