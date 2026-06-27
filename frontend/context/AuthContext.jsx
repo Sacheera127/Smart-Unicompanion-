@@ -66,4 +66,15 @@ export function AuthProvider({ children }) {
         sessionStorage.removeItem("uc_user");
         sessionStorage.removeItem(SEEN_KEY);
         if (pollRef.current) { clearInterval(pollRef.current); pollRef.current = null; }
-    }}
+    };
+    /* ── Notification helpers ── */
+    const markAllRead = useCallback(() =>
+        setNotifications(prev => prev.map(n => ({ ...n, read: true }))), []);
+
+    const markRead = useCallback((id) =>
+        setNotifications(prev => prev.map(n => n.id === id ? { ...n, read: true } : n)), []);
+
+    const dismissNotification = useCallback((id) =>
+        setNotifications(prev => prev.filter(n => n.id !== id)), []);
+
+    const unreadCount = notifications.filter(n => !n.read).length;}
