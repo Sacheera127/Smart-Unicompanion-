@@ -42,4 +42,11 @@ export const THEMES = {
         divider:          "rgba(8,145,178,.08)",
         skeletonBase:     "var(--p100)",
         skeletonShimmer:  "var(--p200)",
-    }}
+    },
+};
+
+export function ThemeProvider({ children }) {
+    const [themeId, setThemeId] = useState(() => {
+        const s = localStorage.getItem("uc_theme");
+        return (s === "light" || s === "dark") ? s : "light";
+    })}
