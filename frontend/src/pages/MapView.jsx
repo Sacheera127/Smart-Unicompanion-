@@ -150,3 +150,115 @@ export default function MapView() {
 
       {!loading && view === "map" && (
         <div style={{ display: "flex", flexDirection: "row", gap: 16, flex: 1, minHeight: 0 }}>
+
+          {/* ── Real Map ── */}
+          <div style={{ flex: 1, minWidth: 0, borderRadius: 18, overflow: "hidden", boxShadow: "0 4px 24px rgba(0,0,0,0.1)", border: "1px solid #E2E8F0" }}>
+            <MapPicker
+              center={mapCenter}
+              zoom={15}
+              markers={filtered}
+              height="calc(100vh - 280px)"
+              style={{ minHeight: 480 }}
+            />
+          </div>
+
+          {/* ── Sidebar listing ── */}
+          <div style={{ display: "flex", flexDirection: "column", gap: 10, overflowY: "auto", maxHeight: "calc(100vh - 280px)", width: "360px", flexShrink: 0, background: "#fff", padding: "18px", borderRadius: "18px", border: "1px solid #E2E8F0", boxShadow: "0 4px 24px rgba(0,0,0,0.06)" }}>
+            <div style={{ fontSize: 11.5, fontWeight: 800, color: "#475569", letterSpacing: "0.8px", textTransform: "uppercase", marginBottom: 4, paddingBottom: 10, borderBottom: "1.5px solid #F1F5F9" }}>
+              {filtered.length} listing{filtered.length !== 1 ? "s" : ""} nearby
+            </div>
+            {filtered.length === 0 && (
+              <div style={{ textAlign: "center", padding: "40px 16px", color: "#94A3B8", fontSize: 13 }}>
+                No listings match your filters.
+              </div>
+            )}
+            {filtered.map((pin) => {
+              const Icon  = TYPE_ICONS[pin.type];
+              const color = TYPE_COLORS[pin.type];
+              const sel   = selectedPin?.id === pin.id;
+              return (
+                <button key={pin.id} onClick={() => setSelectedPin(sel ? null : pin)}
+                  style={{
+                    display: "flex", alignItems: "center", gap: 11,
+                    background: sel ? color + "0F" : "#fff",
+                    border: `1.5px solid ${sel ? color : "#F1F5F9"}`,
+                    borderRadius: 13, padding: "11px 14px",
+                    cursor: "pointer", textAlign: "left",
+                    transition: "all 0.18s cubic-bezier(0.34,1.56,0.64,1)",
+                    transform: sel ? "translateX(3px)" : "none",
+                    boxShadow: sel ? `0 4px 16px ${color}20` : "0 1px 4px rgba(0,0,0,0.04)",
+                  }}>
+                  <div style={{ width: 36, height: 36, background: color + "14", borderRadius: 10, display: "flex", alignItems: "center", justifyContent: "center", color, flexShrink: 0 }}>
+                    <Icon size={17} color={color} />
+                  </div>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ fontSize: 12.5, fontWeight: 700, color: "#0F172A", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{pin.label}</div>
+                    <div style={{ display: "flex", alignItems: "center", gap: 6, marginTop: 3 }}>
+                      {pin.price && <span style={{ fontSize: 11.5, color, fontWeight: 700 }}>{pin.price}</span>}
+                      {pin.distance && <span style={{ fontSize: 10.5, color: "#94A3B8" }}>{pin.distance}</span>}
+                    </div>
+                  </div>
+                  {pin.verified && (
+                    <ShieldCheckIcon size={13} color="#16A34A" />
+                  )}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      {!loading && view === "list" && (
+        <div className="responsive-grid" style={{ gap: 14 }}>
+          {filtered.length === 0 && (
+            <div style={{ gridColumn: "1/-1", textAlign: "center", padding: "60px 20px", color: "#94A3B8", fontSize: 13.5 }}>
+              No listings match your search or filters.
+            </div>
+          )}
+          {filtered.map((pin) => {
+            const Icon  = TYPE_ICONS[pin.type];
+            const color = TYPE_COLORS[pin.type];
+            return (
+              <Card key={pin.id} hover style={{ padding: "16px 18px", display: "flex", alignItems: "center", gap: 14 }}>
+                <div style={{ width: 46, height: 46, background: color + "14", borderRadius: 13, display: "flex", alignItems: "center", justifyContent: "center", color, flexShrink: 0 }}>
+                  <Icon size={22} color={color} />
+                </div>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ fontSize: 13, fontWeight: 700, color: "#0F172A", marginBottom: 3, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{pin.label}</div>
+                  {pin.price && <div style={{ fontSize: 12.5, color, fontWeight: 700 }}>{pin.price}</div>}
+                  <div style={{ display: "flex", gap: 6, marginTop: 5, flexWrap: "wrap" }}>
+                    <span style={{ fontSize: 10.5, fontWeight: 700, background: color + "14", color, padding: "2px 8px", borderRadius: 20 }}>{TYPE_LABELS[pin.type]}</span>
+                    {pin.verified && <span style={{ fontSize: 10.5, fontWeight: 700, background: "#F0FDF4", color: "#15803D", border: "1px solid #86EFAC", padding: "2px 8px", borderRadius: 20 }}>Verified</span>}
+                    {pin.distance && <span style={{ fontSize: 10.5, color: "#94A3B8" }}>{pin.distance}</span>}
+                  </div>
+                </div>
+              </Card>
+            );
+          })}
+        </div>
+      )}
+
+      {/* Legend bar at the bottom */}
+      {!loading && view === "map" && (
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginTop: 10, padding: "8px 0", borderTop: "1px solid #F1F5F9" }}>
+          <span style={{ display: "flex", alignItems: "center", gap: 5, fontSize: 12, color: "#64748B", fontWeight: 500 }}>
+            <ShieldCheckIcon size={14} color="#16A34A" /> Verified listings
+          </span>
+          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+            <span style={{ fontSize: 11, color: "#94A3B8", fontWeight: 700, letterSpacing: "0.5px", marginRight: 4 }}>MAP LEGEND</span>
+            {Object.entries(TYPE_COLORS).map(([type, color]) => {
+              const Icon = TYPE_ICONS[type];
+              return (
+                <span key={type} style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 11.5, color: color, fontWeight: 600, background: color + "14", padding: "5px 12px", borderRadius: 20 }}>
+                  <Icon size={12} color={color} />
+                  {TYPE_LABELS[type]}
+                </span>
+              );
+            })}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
