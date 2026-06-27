@@ -168,3 +168,21 @@ export default function Dashboard() {
                         </Link>
                     </div>
                 </div>
+
+                {/* Hero stat chips */}
+                <div className="relative z-10 flex gap-3 overflow-x-auto pb-2 md:pb-0 no-scrollbar snap-x">
+                    {[
+                        { val: totalBoardings.length, lbl: "Boardings",  Icon: HouseIcon },
+                        { val: totalFood.length,      lbl: "Food Spots", Icon: FoodIcon  },
+                        { val: totalTransport.length, lbl: "Routes",     Icon: BusIcon   },
+                    ].map(({ val, lbl, Icon }, i) => (
+                        <div key={lbl} className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-[24px] p-5 text-center min-w-[100px] snap-center shrink-0 animate-slideDown" style={{ animationDelay: `${0.1 + i * 0.1}s` }}>
+                            <div className="flex justify-center mb-2.5">
+                                <Icon size={22} className="text-white/90" />
+                            </div>
+                            <div className="text-2xl font-black text-white leading-none">{val}</div>
+                            <div className="text-[11px] text-white/60 font-semibold mt-1.5">{lbl}</div>
+                        </div>
+                    ))}
+                </div>
+            </div>
