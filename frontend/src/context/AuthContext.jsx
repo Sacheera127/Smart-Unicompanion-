@@ -25,3 +25,11 @@ const CATEGORY_LABELS = {
     FOOD:      { emoji: "🍽️",  label: "New Food Spot", type: "success" },
     TRANSPORT: { emoji: "🚌", label: "New Transport",  type: "info"    },
 };
+function formatTime(date) {
+    const now = new Date();
+    const diff = Math.floor((now - date) / 60000);
+    if (diff < 1)  return "Just now";
+    if (diff < 60) return `${diff}m ago`;
+    if (diff < 1440) return `${Math.floor(diff / 60)}h ago`;
+    return date.toLocaleDateString("en-GB", { day: "numeric", month: "short" });
+}
