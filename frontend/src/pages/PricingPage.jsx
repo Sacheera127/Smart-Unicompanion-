@@ -25,3 +25,86 @@ export default function PricingPage() {
             </p>
           </motion.div>
         </div>
+
+        <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+          {/* Free Tier */}
+          <motion.div 
+            initial={{ opacity: 0, x: -50 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.1 }}
+            className="bg-white dark:bg-slate-800 rounded-3xl p-8 border border-slate-200 dark:border-slate-700 shadow-xl flex flex-col"
+          >
+            <div className="mb-6 flex items-center justify-center w-12 h-12 rounded-xl bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300">
+              <HomeIcon size={24} />
+            </div>
+            <h3 className="text-2xl font-bold mb-2">Starter</h3>
+            <div className="flex items-baseline gap-2 mb-6">
+              <span className="text-5xl font-black">Free</span>
+              <span className="text-slate-500 font-medium">forever</span>
+            </div>
+            <p className="text-slate-600 dark:text-slate-400 mb-8 flex-1">
+              Perfect for small business owners or landlords just getting started. 
+            </p>
+            <ul className="space-y-4 mb-8">
+              <li className="flex items-start gap-3">
+                <CheckIcon className="text-green-500 shrink-0 mt-0.5" size={18} />
+                <span className="font-medium">Your first 2 posts are completely FREE!</span>
+              </li>
+              <li className="flex items-start gap-3">
+                <CheckIcon className="text-green-500 shrink-0 mt-0.5" size={18} />
+                <span className="text-slate-600 dark:text-slate-300">Valid for Boardings or Food Shops</span>
+              </li>
+              <li className="flex items-start gap-3">
+                <CheckIcon className="text-green-500 shrink-0 mt-0.5" size={18} />
+                <span className="text-slate-600 dark:text-slate-300">Basic analytics & views</span>
+              </li>
+              <li className="flex items-start gap-3">
+                <CheckIcon className="text-green-500 shrink-0 mt-0.5" size={18} />
+                <span className="text-slate-600 dark:text-slate-300">Standard support</span>
+              </li>
+            </ul>
+            <Link to="/register" className="w-full py-4 rounded-xl font-bold text-center border-2 border-slate-200 dark:border-slate-700 hover:border-primary-600 dark:hover:border-primary-500 hover:text-primary-600 transition-colors">
+              Get Started for Free
+            </Link>
+          </motion.div>
+
+          {/* Premium Tier */}
+          <motion.div 
+            initial={{ opacity: 0, x: 50 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.2 }}
+            className="bg-gradient-to-br from-primary-900 to-indigo-900 rounded-3xl p-8 border border-primary-800 shadow-2xl text-white flex flex-col relative overflow-hidden"
+          >
+            <div className="absolute top-0 right-0 p-4">
+              <span className="bg-primary-500 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">Most Popular</span>
+            </div>
+            <div className="mb-6 flex items-center justify-center w-12 h-12 rounded-xl bg-white/10 text-primary-300 backdrop-blur-sm">
+              <ZapIcon size={24} />
+            </div>
+            <h3 className="text-2xl font-bold mb-2">Premium Scale</h3>
+            <div className="flex items-baseline gap-2 mb-6">
+              <span className="text-5xl font-black">Rs. 990</span>
+              <span className="text-primary-200 font-medium">/ per post</span>
+            </div>
+            <p className="text-primary-200 mb-8 flex-1">
+              For established vendors who want to list multiple properties or shops across campuses.
+            </p>
+            <ul className="space-y-4 mb-8">
+              <li className="flex items-start gap-3">
+                <CheckIcon className="text-primary-400 shrink-0 mt-0.5" size={18} />
+                <span className="font-medium text-white">Create unlimited posts</span>
+              </li>
+              <li className="flex items-start gap-3">
+                <CheckIcon className="text-primary-400 shrink-0 mt-0.5" size={18} />
+                <span className="text-primary-100">Featured priority listing</span>
+              </li>
+              <li className="flex items-start gap-3">
+                <CheckIcon className="text-primary-400 shrink-0 mt-0.5" size={18} />
+                <span className="text-primary-100">Advanced performance insights</span>
+              </li>
+              <li className="flex items-start gap-3">
+                <CheckIcon className="text-primary-400 shrink-0 mt-0.5" size={18} />
+                <span className="text-primary-100">Priority 24/7 support</span>
+              </li>
+            </ul>
+            <Link to="/register" className="w-full py-4 rounded-xl font-bold text-center bg-white text-primary-900 hover:bg-slate-100 transition-colors shadow-lg">
+              Start Scaling Now
+            </Link>
+          </motion.div>
+        </div>
