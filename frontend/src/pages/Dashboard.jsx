@@ -212,3 +212,6 @@ export default function Dashboard() {
 
             {loading && <LoadingScreen message="Loading listings near you..." />}
             {error   && <ErrorBox message={error} onRetry={load} />}
+            {!loading && (
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+
