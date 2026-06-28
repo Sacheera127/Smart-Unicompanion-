@@ -18,7 +18,7 @@ export default function Profile() {
   const navigate = useNavigate();
   const [confirmLogout, setConfirmLogout] = useState(false);
 
-  // ── Admin Application State ───────────────────────────────────────────────
+  // Admin Application State
   const [adminRequestStatus, setAdminRequestStatus] = useState(null); // null | "PENDING" | "APPROVED" | "REJECTED"
   const [checkingStatus, setCheckingStatus] = useState(false);
 
@@ -57,7 +57,7 @@ export default function Profile() {
     ] : []),
   ];
 
-  // ── Status display config ─────────────────────────────────────────────────
+  // Status display config
   const STATUS_CONFIG = {
     PENDING:  { color: "text-amber-600 dark:text-amber-500", bg: "bg-amber-50 dark:bg-amber-900/20", border: "border-amber-200 dark:border-amber-800", icon: <ClockIcon size={18} className="text-amber-600 dark:text-amber-500" />, label: "Application Pending", desc: "Your admin request is being reviewed by the master admin. You'll be notified once a decision is made." },
     APPROVED: { color: "text-green-600 dark:text-green-500", bg: "bg-green-50 dark:bg-green-900/20", border: "border-green-200 dark:border-green-800", icon: <CheckIcon size={18} className="text-green-600 dark:text-green-500" />, label: "Application Approved!", desc: "Congratulations! Your admin access has been approved. Please log out and log back in to access your admin features." },
