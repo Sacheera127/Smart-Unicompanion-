@@ -7,6 +7,7 @@ public class MessageResponse {
         this.message = message;
     }
 
+    //check the method here.
     public String getMessage() {
         return message;
     }
