@@ -100,3 +100,79 @@ function ReviewRow({ review, theme }) {
   );
 }
 
+function RatingBar({ star, count, total, theme }) {
+  const pct = total > 0 ? Math.round((count / total) * 100) : 0;
+  return (
+    <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 4 }}>
+      <span style={{ fontSize: 11.5, color: theme.textMuted, width: 10, textAlign: "right", fontWeight: 600 }}>{star}</span>
+      <svg width={11} height={11} viewBox="0 0 24 24" fill="#F59E0B" stroke="#F59E0B" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+      </svg>
+      <div style={{ flex: 1, height: 6, background: theme.divider, borderRadius: 99, overflow: "hidden" }}>
+        <div style={{
+          width: `${pct}%`, height: "100%",
+          background: "linear-gradient(90deg, #F59E0B, #FBBF24)",
+          borderRadius: 99, transition: "width .5s ease",
+        }} />
+      </div>
+      <span style={{ fontSize: 11, color: theme.textFaint, width: 28 }}>{count}</span>
+    </div>
+  );
+}
+
+export default function RatingModal({ post, gradient, onClose, onRated }) {
+  const { user } = useAuth();
+  const { theme } = useTheme();
+
+  const [userRating, setUserRating]   = useState(0);
+  const [comment,    setComment]      = useState("");
+  const [submitting, setSubmitting]   = useState(false);
+  const [submitted,  setSubmitted]    = useState(false);
+  const [error,      setError]        = useState("");
+
+  const [reviews,   setReviews]   = useState(post.reviews || []);
+  const [loadingRv, setLoadingRv] = useState(false);
+
+  useEffect(() => {
+    const postId = post._id || post.id;
+    if (!postId) return;
+    setLoadingRv(true);
+    getReviews(postId).then(res => {
+      if (res.success && Array.isArray(res.data)) setReviews(res.data);
+      setLoadingRv(false);
+    });
+  }, [post._id, post.id]);
+
+  const totalRatings = reviews.length;
+  const avgRating    = totalRatings > 0
+    ? (reviews.reduce((acc, r) => acc + r.rating, 0) / totalRatings).toFixed(1)
+    : (post.rating || 0).toFixed(1);
+
+  const dist = [5,4,3,2,1].map(s => ({
+    star: s, count: reviews.filter(r => r.rating === s).length,
+  }));
+
+  const handleSubmit = async () => {
+    if (!userRating) { setError("Please pick a star rating before submitting."); return; }
+    setError(""); setSubmitting(true);
+    const res = await addReview(post._id || post.id, { rating: userRating, comment: comment.trim() });
+    setSubmitting(false);
+    if (!res.success) { setError(res.message); return; }
+
+    const newReview = {
+      rating: userRating,
+      comment: comment.trim(),
+      studentName: user?.name || "You",
+      createdAt: new Date().toISOString(),
+    };
+    setReviews(prev => [newReview, ...prev]);
+    setSubmitted(true);
+    onRated?.({ rating: userRating, comment: comment.trim() });
+  };
+
+  useEffect(() => {
+    document.body.style.overflow = "hidden";
+    return () => { document.body.style.overflow = ""; };
+  }, []);
+
+}
