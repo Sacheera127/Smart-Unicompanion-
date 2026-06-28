@@ -73,3 +73,64 @@ export default function LandingPage() {
                     </motion.div>
                 </div>
             </section>
+
+            {/* ── Brands Section ─────────────────────────────────────────────────────── */}
+            <section className="py-16 bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 relative z-20">
+                <div className="max-w-7xl mx-auto px-6 text-center">
+                    <p className="text-sm font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-8">
+                        Campuses using Unify
+                    </p>
+                    <div className="flex flex-wrap justify-center items-center gap-10 md:gap-20 opacity-70 grayscale hover:grayscale-0 transition-all duration-500">
+                        <img src="/logo_uoc.png" alt="University of Colombo" className="h-16 md:h-20 object-contain drop-shadow-sm hover:scale-110 transition-transform" />
+                        <img src="/logo_uom.png" alt="University of Moratuwa" className="h-16 md:h-20 object-contain drop-shadow-sm hover:scale-110 transition-transform" />
+                        <img src="/logo_usj.png" alt="University of Sri Jayewardenepura" className="h-16 md:h-20 object-contain drop-shadow-sm hover:scale-110 transition-transform" />
+                        <img src="/logo_uop.png" alt="University of Peradeniya" className="h-16 md:h-20 object-contain drop-shadow-sm hover:scale-110 transition-transform" />
+                    </div>
+                </div>
+            </section>
+
+            {/* ── Features Section ─────────────────────────────────────────────────── */}
+            <section className="py-24 px-6 bg-slate-50 dark:bg-slate-900 relative z-10 border-b border-slate-200 dark:border-slate-800">
+                <div className="max-w-7xl mx-auto text-center">
+                    <div className="mb-16">
+                        <h2 className="text-4xl md:text-5xl font-black mb-4 tracking-tight">Everything You Need</h2>
+                        <p className="text-lg text-slate-600 dark:text-slate-400 max-w-2xl mx-auto">
+                            Your comprehensive guide to university essentials, actively curated and verified by senior students for utmost reliability.
+                        </p>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-left">
+                        <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="bg-white dark:bg-slate-800 p-8 rounded-3xl border border-slate-200 dark:border-slate-700 shadow-xl hover:-translate-y-2 transition-transform duration-300">
+                            <div className="w-14 h-14 bg-blue-100 dark:bg-blue-900/40 text-blue-600 dark:text-blue-400 rounded-2xl flex items-center justify-center mb-6">
+                                <HouseIcon size={28} />
+                            </div>
+                            <h3 className="text-2xl font-bold mb-3">Boardings</h3>
+                            <p className="text-slate-600 dark:text-slate-400">Discover safe, affordable, and highly-rated accommodations near your campus. Filter by price, distance, and amenities.</p>
+                        </motion.div>
+
+                        <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: 0.1 }} className="bg-white dark:bg-slate-800 p-8 rounded-3xl border border-slate-200 dark:border-slate-700 shadow-xl hover:-translate-y-2 transition-transform duration-300">
+                            <div className="w-14 h-14 bg-orange-100 dark:bg-orange-900/40 text-orange-600 dark:text-orange-400 rounded-2xl flex items-center justify-center mb-6">
+                                <FoodIcon size={28} />
+                            </div>
+                            <h3 className="text-2xl font-bold mb-3">Food & Dining</h3>
+                            <p className="text-slate-600 dark:text-slate-400">Find the best local eateries, budget-friendly meal spots, and hidden culinary gems recommended by your seniors.</p>
+                        </motion.div>
+
+                        <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: 0.2 }} className="bg-white dark:bg-slate-800 p-8 rounded-3xl border border-slate-200 dark:border-slate-700 shadow-xl hover:-translate-y-2 transition-transform duration-300">
+                            <div className="w-14 h-14 bg-emerald-100 dark:bg-emerald-900/40 text-emerald-600 dark:text-emerald-400 rounded-2xl flex items-center justify-center mb-6">
+                                <BusIcon size={28} />
+                            </div>
+                            <h3 className="text-2xl font-bold mb-3">Transport</h3>
+                            <p className="text-slate-600 dark:text-slate-400">Never miss a bus or train. Access curated transport routes, schedules, and specific pathways right to the university gates.</p>
+                        </motion.div>
+                    </div>
+                </div>
+            </section>
+
+            {/* Footer */}
+            <footer className="bg-slate-900 text-slate-400 py-12 text-center">
+                <p>© 2026 Unify. All rights reserved.</p>
+            </footer>
+        </div>
+    );
+}
