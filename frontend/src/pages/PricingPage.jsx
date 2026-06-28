@@ -108,3 +108,30 @@ export default function PricingPage() {
             </Link>
           </motion.div>
         </div>
+
+        {/* FAQ Section */}
+        <div className="mt-24 max-w-3xl mx-auto">
+          <h2 className="text-3xl font-bold text-center mb-10">Frequently Asked Questions</h2>
+          <div className="space-y-4">
+            {[
+              { q: "Is the student account free?", a: "Yes! Students get 100% free access to browse all resources, review places, and use the smart maps. Pricing only applies to vendors/landlords posting listings." },
+              { q: "What happens after my 2 free posts?", a: "Your first two active posts (either boarding or food shop) are completely free. If you wish to list a 3rd item, you will be prompted to upgrade to a premium post." },
+              { q: "Are there any subscription fees?", a: "No. You only pay a one-time fee per active premium post. We do not charge monthly subscription fees." },
+            ].map((faq, i) => (
+              <div key={i} className="bg-white dark:bg-slate-800 p-6 rounded-2xl border border-slate-200 dark:border-slate-700">
+                <h4 className="font-bold text-lg mb-2">{faq.q}</h4>
+                <p className="text-slate-600 dark:text-slate-400">{faq.a}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </main>
+
+      {/* Footer */}
+      <footer className="bg-slate-900 text-slate-400 py-12 border-t border-slate-800 text-center">
+        <p>© 2026 Unify. All rights reserved.</p>
+      </footer>
+    </div>
+  );
+}
+
