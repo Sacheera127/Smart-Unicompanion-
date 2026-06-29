@@ -4,9 +4,10 @@ import { useAuth } from "../context/AuthContext";
 import { createPost, uploadPostImages } from "../api/api";
 import { Button, Input, Select, PageHeader, ErrorBox } from "../components/ui";
 import { useToast } from "../components/Toast";
-import { HouseIcon, FoodIcon, BusIcon, MapPinIcon, CheckIcon, XIcon, ImageIcon, UploadIcon } from "../components/Icons";
+import { HouseIcon, FoodIcon, BusIcon, MapPinIcon, CheckIcon, XIcon, ImageIcon, UploadIcon, TrashIcon, ShieldCheckIcon } from "../components/Icons";
 import MapPicker from "../components/MapPicker";
 
+// University centre coordinates for the map default view
 const UNI_CENTERS = {
   "University of Moratuwa":                        [6.7955, 79.9012],
   "University of Colombo":                         [6.9022, 79.8607],
@@ -49,7 +50,7 @@ export default function Submit() {
   });
   const [pickedLocation, setPickedLocation] = useState(null);
   const [showMap, setShowMap] = useState(false);
-  const [images, setImages] = useState([]);
+  const [images, setImages] = useState([]); // { id, file, preview, name }
   const fileInputRef = useRef(null);
 
   const MAX_IMAGES = 5;
@@ -79,6 +80,7 @@ export default function Submit() {
   const [serverError, setServerError] = useState("");
   const [loading, setLoading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const [paymentStep, setPaymentStep] = useState("NONE"); // NONE, LIMIT_REACHED, CHECKOUT, PROCESSING, SUCCESS
 
   const set = (k, v) => { setForm((f) => ({ ...f, [k]: v })); setErrors((e) => ({ ...e, [k]: "" })); };
   const toggleTag = (tag) => set("tags", form.tags.includes(tag) ? form.tags.filter((t) => t !== tag) : [...form.tags, tag]);
@@ -91,7 +93,6 @@ export default function Submit() {
     if (!form.description.trim()) e.description = "Please add a short description.";
     else if (form.description.trim().length < 20) e.description = "Description should be at least 20 characters so students know what to expect.";
     if (!form.area.trim()) e.area = "Please enter the area or street name.";
-    
     if (category === "BOARDING") {
       if (!form.price) e.price = "Please enter the monthly rent.";
       else if (isNaN(form.price) || Number(form.price) < 1000) e.price = "Rent should be a valid amount (at least Rs. 1,000).";
@@ -111,7 +112,7 @@ export default function Submit() {
     return e;
   };
 
-  const handleSubmit = async (ev) => {
+  const handleSubmit = async (ev, isPremium = false) => {
     if (ev) ev.preventDefault();
     setServerError("");
     const e = validate();
@@ -143,12 +144,16 @@ export default function Submit() {
       ...(category === "BOARDING" && { price: Number(form.price), genderType: form.genderType, hasKitchen: form.hasKitchen, contact: form.contact.trim() }),
       ...(category === "FOOD" && { priceRange: form.price, tags: form.tags }),
       ...(category === "TRANSPORT" && { routeNumber: form.routeNumber.trim(), fromLocation: form.from.trim(), toLocation: form.to.trim(), frequency: form.frequency.trim(), lastBus: form.lastBus.trim() }),
-      premium: false,
+      premium: isPremium,
     };
 
     const res = await createPost(payload);
     setLoading(false);
     if (!res.success) { 
+      if (res.message === "PAYMENT_REQUIRED") {
+        setPaymentStep("LIMIT_REACHED");
+        return;
+      }
       setServerError(res.message); 
       return; 
     }
@@ -185,8 +190,112 @@ export default function Submit() {
 
       {serverError && <div style={{ marginBottom: 20 }}><ErrorBox message={serverError} /></div>}
 
+      {/* Payment Sandbox Flow */}
+      {paymentStep !== "NONE" && (
+        <div style={{ position: "fixed", inset: 0, zIndex: 9999, display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }}>
+          <div style={{ position: "absolute", inset: 0, background: "rgba(15, 23, 42, 0.6)", backdropFilter: "blur(4px)" }} onClick={() => paymentStep !== 'PROCESSING' && setPaymentStep("NONE")} />
+          
+          {/* STEP 1: Limit Reached */}
+          {paymentStep === "LIMIT_REACHED" && (
+            <div style={{ position: "relative", width: "100%", maxWidth: 420, background: "#fff", borderRadius: 24, padding: 32, boxShadow: "0 20px 40px rgba(0,0,0,0.1)", textAlign: "center" }}>
+              <div style={{ width: 64, height: 64, background: "#EEF2FF", border: "2px solid #C7D2FE", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 20px" }}>
+                 <span style={{ fontSize: 28 }}>💎</span>
+              </div>
+              <h3 style={{ fontSize: 22, fontWeight: 800, color: "#0F172A", marginBottom: 12, tracking: "-0.5px" }}>Limit Reached</h3>
+              <p style={{ fontSize: 14.5, color: "#475569", lineHeight: 1.6, marginBottom: 24 }}>
+                You have already posted your 2 free lifetime listings. To publish this new listing, please upgrade to a Premium Post for Rs. 990.
+              </p>
+              <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+                <Button onClick={() => setPaymentStep("CHECKOUT")} style={{ width: "100%", background: "linear-gradient(to right, #1E3A8A, #3B82F6)" }}>
+                  Pay Rs. 990 & Publish
+                </Button>
+                <Button variant="secondary" onClick={() => setPaymentStep("NONE")} style={{ width: "100%" }}>
+                  Maybe Later
+                </Button>
+              </div>
+            </div>
+          )}
+
+          {/* STEP 2: Checkout Sandbox */}
+          {paymentStep === "CHECKOUT" && (
+            <div style={{ position: "relative", width: "100%", maxWidth: 720, background: "#fff", borderRadius: 24, overflow: "hidden", display: "flex", flexWrap: "wrap", boxShadow: "0 25px 50px -12px rgba(0,0,0,0.25)" }}>
+              {/* Order Summary */}
+              <div style={{ flex: "1 1 250px", background: "linear-gradient(135deg, #1E3A8A, #3B82F6)", padding: "40px 32px", color: "white", display: "flex", flexDirection: "column", justifyContent: "space-between", textAlign: "left" }}>
+                <div>
+                  <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 20 }}>
+                    <div style={{ width: 32, height: 32, background: "rgba(255,255,255,0.2)", borderRadius: 8, display: "flex", alignItems: "center", justifyContent: "center" }}>💎</div>
+                    <span style={{ fontSize: 13, fontWeight: 700, letterSpacing: 1, textTransform: "uppercase", opacity: 0.9 }}>Premium Listing</span>
+                  </div>
+                  <h2 style={{ fontSize: 36, fontWeight: 800, marginBottom: 8, letterSpacing: "-1px" }}>Rs. 990</h2>
+                  <p style={{ fontSize: 14, opacity: 0.85, lineHeight: 1.6 }}>Unlock unlimited reach and bypass the free post limits to get your listing live immediately.</p>
+                </div>
+                <div style={{ marginTop: 40, display: "flex", alignItems: "center", gap: 8, opacity: 0.7, fontSize: 12.5, fontWeight: 500 }}>
+                  <ShieldCheckIcon size={16} /> 256-bit SSL Secure Checkout
+                </div>
+              </div>
+              
+              {/* Payment Details */}
+              <div style={{ flex: "2 1 350px", padding: "40px 32px", background: "#fff", textAlign: "left" }}>
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 28 }}>
+                  <h3 style={{ fontSize: 20, fontWeight: 800, color: "#0F172A" }}>Payment Details</h3>
+                  <span style={{ fontSize: 11, background: "#F8FAFC", color: "#64748B", padding: "6px 10px", borderRadius: 8, fontWeight: 700, border: "1px solid #E2E8F0" }}>TEST SANDBOX</span>
+                </div>
+                
+                <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+                  <Input label="Name on Card" placeholder="e.g. John Doe" />
+                  <Input label="Card Number" placeholder="0000 0000 0000 0000" maxLength={19} />
+                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
+                    <Input label="Expiry (MM/YY)" placeholder="MM/YY" maxLength={5} />
+                    <Input label="CVC" placeholder="123" type="password" maxLength={3} />
+                  </div>
+                </div>
+
+                <div style={{ display: "flex", gap: 12, marginTop: 32 }}>
+                  <Button variant="secondary" onClick={() => setPaymentStep("NONE")} style={{ flex: 1, padding: "14px 0", fontSize: 15, justifyContent: "center" }}>Cancel</Button>
+                  <Button onClick={() => {
+                    setPaymentStep("PROCESSING");
+                    setTimeout(() => {
+                      setPaymentStep("SUCCESS");
+                      setTimeout(() => {
+                        setPaymentStep("NONE");
+                        handleSubmit(null, true);
+                      }, 1500);
+                    }, 2000);
+                  }} style={{ flex: 2, background: "#16A34A", padding: "14px 0", fontSize: 15, justifyContent: "center", boxShadow: "0 4px 14px rgba(22, 163, 74, 0.3)" }}>
+                    Pay Rs. 990 Securely
+                  </Button>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* STEP 3 & 4: Processing / Success */}
+          {(paymentStep === "PROCESSING" || paymentStep === "SUCCESS") && (
+            <div style={{ position: "relative", width: "100%", maxWidth: 320, background: "#fff", borderRadius: 20, padding: 32, textAlign: "center", boxShadow: "0 20px 40px rgba(0,0,0,0.15)" }}>
+              {paymentStep === "PROCESSING" ? (
+                <>
+                  <div style={{ width: 50, height: 50, border: "4px solid #E2E8F0", borderTopColor: "#3B82F6", borderRadius: "50%", margin: "0 auto 16px", animation: "spin 1s linear infinite" }} />
+                  <h3 style={{ fontSize: 16, fontWeight: 700, color: "#0F172A" }}>Processing Payment...</h3>
+                  <p style={{ fontSize: 13, color: "#64748B", marginTop: 8 }}>Please do not close this window.</p>
+                  <style>{`@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }`}</style>
+                </>
+              ) : (
+                <>
+                  <div style={{ width: 60, height: 60, background: "#DCFCE7", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 16px" }}>
+                    <CheckIcon size={30} color="#16A34A" strokeWidth={3} />
+                  </div>
+                  <h3 style={{ fontSize: 18, fontWeight: 800, color: "#16A34A" }}>Payment Successful!</h3>
+                  <p style={{ fontSize: 13, color: "#475569", marginTop: 8 }}>Publishing your premium listing...</p>
+                </>
+              )}
+            </div>
+          )}
+        </div>
+      )}
+
       <form onSubmit={handleSubmit} noValidate>
-        {/* Category Step */}
+
+        {/* Step 1 — Category */}
         <div style={{ background: "#fff", borderRadius: 16, padding: "24px 26px", marginBottom: 18, border: "1px solid #F1F5F9", boxShadow: "0 1px 4px rgba(0,0,0,0.05)" }}>
           <h3 style={{ fontSize: 14, fontWeight: 700, color: "#0F172A", marginBottom: 4 }}>What are you listing?</h3>
           <p style={{ fontSize: 12, color: "#94A3B8", marginBottom: 18 }}>Choose the type that best describes your submission.</p>
@@ -202,7 +311,7 @@ export default function Submit() {
           </div>
         </div>
 
-        {/* Dynamic Form Sections */}
+        {/* Step 2 — Details */}
         {category && (
           <div style={{ background: "#fff", borderRadius: 16, padding: "24px 26px", marginBottom: 18, border: "1px solid #F1F5F9", boxShadow: "0 1px 4px rgba(0,0,0,0.05)" }}>
             <h3 style={{ fontSize: 14, fontWeight: 700, color: "#0F172A", marginBottom: 18 }}>Listing details</h3>
@@ -221,14 +330,25 @@ export default function Submit() {
               </div>
               <Input label="Area / Street" placeholder="e.g. Katubedda, near the engineering faculty" icon={<MapPinIcon size={14} />} value={form.area} error={errors.area} onChange={(e) => set("area", e.target.value)} />
 
-              {/* Map location picker */}
+              {/* ── Map location picker ── */}
               <div>
                 <label style={{ fontSize: 12.5, fontWeight: 600, color: "#475569", display: "block", marginBottom: 8 }}>
                   Pin exact location on map <span style={{ fontSize: 11, color: "#94A3B8", fontWeight: 400 }}>(optional but recommended)</span>
                 </label>
+
+                {/* Toggle button */}
                 {!showMap ? (
                   <button type="button" onClick={() => setShowMap(true)}
-                    style={{ display: "flex", alignItems: "center", gap: 10, width: "100%", padding: "13px 16px", borderRadius: 12, border: `2px dashed ${pickedLocation ? "#86EFAC" : "#BFDBFE"}`, background: pickedLocation ? "#F0FDF4" : "#F8FBFF", cursor: "pointer", transition: "all 0.2s", fontFamily: "inherit" }}>
+                    style={{
+                      display: "flex", alignItems: "center", gap: 10, width: "100%",
+                      padding: "13px 16px", borderRadius: 12,
+                      border: `2px dashed ${pickedLocation ? "#86EFAC" : "#BFDBFE"}`,
+                      background: pickedLocation ? "#F0FDF4" : "#F8FBFF",
+                      cursor: "pointer", transition: "all 0.2s", fontFamily: "inherit",
+                    }}
+                    onMouseEnter={(e) => { e.currentTarget.style.borderColor = "#3B82F6"; e.currentTarget.style.background = "#EFF6FF"; }}
+                    onMouseLeave={(e) => { e.currentTarget.style.borderColor = pickedLocation ? "#86EFAC" : "#BFDBFE"; e.currentTarget.style.background = pickedLocation ? "#F0FDF4" : "#F8FBFF"; }}
+                  >
                     <div style={{ width: 36, height: 36, borderRadius: 10, background: pickedLocation ? "#DCFCE7" : "#DBEAFE", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
                       <MapPinIcon size={18} color={pickedLocation ? "#16A34A" : "#2563EB"} />
                     </div>
@@ -236,7 +356,9 @@ export default function Submit() {
                       {pickedLocation ? (
                         <>
                           <div style={{ fontSize: 12.5, fontWeight: 700, color: "#15803D" }}>Location pinned</div>
-                          <div style={{ fontSize: 11, color: "#64748B", marginTop: 1 }}>{pickedLocation[0].toFixed(5)}, {pickedLocation[1].toFixed(5)} · Click to reopen map</div>
+                          <div style={{ fontSize: 11, color: "#64748B", marginTop: 1 }}>
+                            {pickedLocation[0].toFixed(5)}, {pickedLocation[1].toFixed(5)} · Click to reopen map
+                          </div>
                         </>
                       ) : (
                         <>
@@ -246,29 +368,56 @@ export default function Submit() {
                       )}
                     </div>
                     {pickedLocation && (
-                      <button type="button" onClick={(e) => { e.stopPropagation(); setPickedLocation(null); }} style={{ background: "#FEE2E2", border: "none", borderRadius: 7, width: 26, height: 26, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", flexShrink: 0 }}>
+                      <button type="button"
+                        onClick={(e) => { e.stopPropagation(); setPickedLocation(null); }}
+                        style={{ background: "#FEE2E2", border: "none", borderRadius: 7, width: 26, height: 26, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", flexShrink: 0 }}>
                         <XIcon size={12} color="#DC2626" />
                       </button>
                     )}
                   </button>
                 ) : (
                   <div style={{ borderRadius: 14, overflow: "hidden", border: "2px solid #BFDBFE", boxShadow: "0 4px 20px rgba(37,99,235,0.12)" }}>
-                    <div style={{ display: "flex", alignItems: "center", justifyBetween: "space-between", padding: "10px 14px", background: "linear-gradient(90deg,#1D4ED8,#2563EB)", color: "white" }}>
+                    {/* Map header */}
+                    <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "10px 14px", background: "linear-gradient(90deg,#1D4ED8,#2563EB)", color: "white" }}>
                       <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                         <MapPinIcon size={14} color="white" />
                         <span style={{ fontSize: 12.5, fontWeight: 600 }}>Drop a pin on the exact location</span>
                       </div>
-                      <button type="button" onClick={() => setShowMap(false)} style={{ background: "rgba(255,255,255,0.2)", border: "none", borderRadius: 7, width: 26, height: 26, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", color: "white" }}>
+                      <button type="button" onClick={() => setShowMap(false)}
+                        style={{ background: "rgba(255,255,255,0.2)", border: "none", borderRadius: 7, width: 26, height: 26, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", color: "white" }}>
                         <XIcon size={13} color="white" />
                       </button>
                     </div>
-                    <MapPicker center={UNI_CENTERS[user?.university] || UNI_CENTERS.default} zoom={15} markers={[]} pickMode={true} onPick={(lat, lng) => setPickedLocation([lat, lng])} pickedPoint={pickedLocation} height="340px" />
+
+                    {/* Real map */}
+                    <MapPicker
+                      center={UNI_CENTERS[user?.university] || UNI_CENTERS.default}
+                      zoom={15}
+                      markers={[]}
+                      pickMode={true}
+                      onPick={(lat, lng) => {
+                        setPickedLocation([lat, lng]);
+                        // Auto-fill area from reverse geocode happens inside MapPicker
+                      }}
+                      pickedPoint={pickedLocation}
+                      height="340px"
+                    />
+
+                    {/* Confirm / close bar */}
                     <div style={{ padding: "10px 14px", background: "#F8FAFC", borderTop: "1px solid #E2E8F0", display: "flex", alignItems: "center", gap: 10 }}>
                       {pickedLocation ? (
                         <>
-                          <div style={{ flex: 1 }}><span style={{ fontSize: 11.5, fontWeight: 700, color: "#15803D" }}>Pin set — {pickedLocation[0].toFixed(5)}, {pickedLocation[1].toFixed(5)}</span></div>
-                          <Button size="sm" variant="success" type="button" onClick={() => setShowMap(false)}><CheckIcon size={12} /> Confirm location</Button>
-                          <Button size="sm" variant="secondary" type="button" onClick={() => setPickedLocation(null)}>Reset</Button>
+                          <div style={{ flex: 1 }}>
+                            <span style={{ fontSize: 11.5, fontWeight: 700, color: "#15803D" }}>
+                              Pin set — {pickedLocation[0].toFixed(5)}, {pickedLocation[1].toFixed(5)}
+                            </span>
+                          </div>
+                          <Button size="sm" variant="success" type="button" onClick={() => setShowMap(false)}>
+                            <CheckIcon size={12} /> Confirm location
+                          </Button>
+                          <Button size="sm" variant="secondary" type="button" onClick={() => { setPickedLocation(null); }}>
+                            Reset
+                          </Button>
                         </>
                       ) : (
                         <span style={{ fontSize: 12, color: "#94A3B8", flex: 1 }}>Click anywhere on the map to place your pin</span>
@@ -278,35 +427,106 @@ export default function Submit() {
                 )}
               </div>
 
-              {/* Image Upload Component */}
+              {/* ── Image Upload ── */}
               {category !== "TRANSPORT" && (
                 <div>
                   <label style={{ fontSize: 12.5, fontWeight: 600, color: "#475569", display: "flex", alignItems: "center", gap: 6, marginBottom: 10 }}>
-                    <ImageIcon size={14} color="#2563EB" /> Photos <span style={{ fontSize: 11, color: "#94A3B8", fontWeight: 400 }}>({images.length}/{MAX_IMAGES})</span>
+                    <ImageIcon size={14} color="#2563EB" />
+                    Photos
+                    <span style={{ fontSize: 11, color: "#94A3B8", fontWeight: 400 }}>({images.length}/{MAX_IMAGES} — {category === "BOARDING" ? "room photos" : "food photos"})</span>
                   </label>
+
+                  {/* Drop zone */}
                   {images.length < MAX_IMAGES && (
-                    <div onDragOver={(e) => { e.preventDefault(); setDragOver(true); }} onDragLeave={() => setDragOver(false)} onDrop={(e) => { e.preventDefault(); setDragOver(false); handleImageFiles(e.dataTransfer.files); }} onClick={() => fileInputRef.current?.click()} style={{ border: `2px dashed ${dragOver ? "#3B82F6" : "#BFDBFE"}`, borderRadius: 14, padding: "24px 20px", textAlign: "center", cursor: "pointer", background: dragOver ? "#EFF6FF" : "#F8FBFF", transition: "all 0.2s", marginBottom: images.length > 0 ? 12 : 0 }}>
-                      <div style={{ width: 44, height: 44, background: "#DBEAFE", borderRadius: 12, display: "inline-flex", alignItems: "center", justifyContent: "center", marginBottom: 10 }}><UploadIcon size={22} color="#2563EB" /></div>
-                      <div style={{ fontSize: 13, fontWeight: 600, color: "#2563EB", marginBottom: 4 }}>Drop photos here or click to browse</div>
-                      <div style={{ fontSize: 11.5, color: "#94A3B8" }}>PNG, JPG, WEBP up to 5MB each</div>
-                      <input ref={fileInputRef} type="file" accept="image/*" multiple style={{ display: "none" }} onChange={(e) => handleImageFiles(e.target.files)} />
+                    <div
+                      onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
+                      onDragLeave={() => setDragOver(false)}
+                      onDrop={(e) => { e.preventDefault(); setDragOver(false); handleImageFiles(e.dataTransfer.files); }}
+                      onClick={() => fileInputRef.current?.click()}
+                      style={{
+                        border: `2px dashed ${dragOver ? "#3B82F6" : "#BFDBFE"}`,
+                        borderRadius: 14,
+                        padding: "24px 20px",
+                        textAlign: "center",
+                        cursor: "pointer",
+                        background: dragOver ? "#EFF6FF" : "#F8FBFF",
+                        transition: "all 0.2s",
+                        marginBottom: images.length > 0 ? 12 : 0,
+                      }}
+                      onMouseEnter={(e) => { e.currentTarget.style.borderColor = "#3B82F6"; e.currentTarget.style.background = "#EFF6FF"; }}
+                      onMouseLeave={(e) => { if (!dragOver) { e.currentTarget.style.borderColor = "#BFDBFE"; e.currentTarget.style.background = "#F8FBFF"; } }}
+                    >
+                      <div style={{ width: 44, height: 44, background: "#DBEAFE", borderRadius: 12, display: "inline-flex", alignItems: "center", justifyContent: "center", marginBottom: 10 }}>
+                        <UploadIcon size={22} color="#2563EB" />
+                      </div>
+                      <div style={{ fontSize: 13, fontWeight: 600, color: "#2563EB", marginBottom: 4 }}>
+                        Drop photos here or click to browse
+                      </div>
+                      <div style={{ fontSize: 11.5, color: "#94A3B8" }}>
+                        PNG, JPG, WEBP up to 5MB each · Max {MAX_IMAGES} photos
+                      </div>
+                      <input
+                        ref={fileInputRef}
+                        type="file"
+                        accept="image/*"
+                        multiple
+                        style={{ display: "none" }}
+                        onChange={(e) => handleImageFiles(e.target.files)}
+                      />
                     </div>
                   )}
+
+                  {/* Preview grid */}
                   {images.length > 0 && (
                     <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(120px, 1fr))", gap: 10 }}>
                       {images.map((img, idx) => (
-                        <div key={img.id} style={{ position: "relative", borderRadius: 12, overflow: "hidden", aspectRatio: "4/3", background: "#F1F5F9", border: "1.5px solid #E2E8F0" }}>
-                          <img src={img.preview} alt={img.name} style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
-                          {idx === 0 && <div style={{ position: "absolute", top: 6, left: 6, background: "rgba(37,99,235,0.9)", color: "white", fontSize: 9, fontWeight: 700, padding: "2px 7px", borderRadius: 20 }}>Cover</div>}
-                          <button type="button" onClick={() => removeImage(img.id)} style={{ position: "absolute", top: 6, right: 6, width: 24, height: 24, borderRadius: "50%", background: "rgba(0,0,0,0.55)", border: "none", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", color: "white" }}><XIcon size={11} color="white" /></button>
+                        <div key={img.id} style={{ position: "relative", borderRadius: 12, overflow: "hidden", aspectRatio: "4/3", background: "#F1F5F9", border: "1.5px solid #E2E8F0", boxShadow: "0 2px 8px rgba(0,0,0,0.06)" }}>
+                          <img
+                            src={img.preview}
+                            alt={img.name}
+                            style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
+                          />
+                          {/* Primary badge */}
+                          {idx === 0 && (
+                            <div style={{ position: "absolute", top: 6, left: 6, background: "rgba(37,99,235,0.9)", color: "white", fontSize: 9, fontWeight: 700, padding: "2px 7px", borderRadius: 20 }}>
+                              Cover
+                            </div>
+                          )}
+                          {/* Remove button */}
+                          <button
+                            type="button"
+                            onClick={() => removeImage(img.id)}
+                            style={{ position: "absolute", top: 6, right: 6, width: 24, height: 24, borderRadius: "50%", background: "rgba(0,0,0,0.55)", border: "none", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", color: "white", transition: "background 0.15s" }}
+                            onMouseEnter={(e) => e.currentTarget.style.background = "rgba(220,38,38,0.85)"}
+                            onMouseLeave={(e) => e.currentTarget.style.background = "rgba(0,0,0,0.55)"}
+                          >
+                            <XIcon size={11} color="white" />
+                          </button>
+                          {/* File name tooltip */}
+                          <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, background: "linear-gradient(transparent, rgba(0,0,0,0.55))", padding: "12px 7px 5px" }}>
+                            <div style={{ fontSize: 9.5, color: "rgba(255,255,255,0.8)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{img.size}</div>
+                          </div>
                         </div>
                       ))}
+                      {/* Add more tile */}
+                      {images.length < MAX_IMAGES && (
+                        <button
+                          type="button"
+                          onClick={() => fileInputRef.current?.click()}
+                          style={{ aspectRatio: "4/3", borderRadius: 12, border: "2px dashed #BFDBFE", background: "#F8FBFF", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 5, cursor: "pointer", color: "#2563EB", transition: "all 0.15s" }}
+                          onMouseEnter={(e) => { e.currentTarget.style.borderColor = "#3B82F6"; e.currentTarget.style.background = "#EFF6FF"; }}
+                          onMouseLeave={(e) => { e.currentTarget.style.borderColor = "#BFDBFE"; e.currentTarget.style.background = "#F8FBFF"; }}
+                        >
+                          <ImageIcon size={20} color="#2563EB" />
+                          <span style={{ fontSize: 10.5, fontWeight: 600 }}>Add more</span>
+                        </button>
+                      )}
                     </div>
                   )}
                 </div>
               )}
 
-              {/* Categorized Fields */}
+              {/* Boarding-specific */}
               {category === "BOARDING" && (
                 <>
                   <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
@@ -315,12 +535,16 @@ export default function Submit() {
                   </div>
                   <Input label="Contact number" type="tel" placeholder="e.g. 0712345678" value={form.contact} error={errors.contact} onChange={(e) => set("contact", e.target.value)} />
                   <label style={{ display: "flex", alignItems: "center", gap: 10, cursor: "pointer" }}>
-                    <div onClick={() => set("hasKitchen", !form.hasKitchen)} style={{ width: 20, height: 20, borderRadius: 6, border: `2px solid ${form.hasKitchen ? "#2563EB" : "#CBD5E1"}`, background: form.hasKitchen ? "#2563EB" : "#fff", display: "flex", alignItems: "center", justifyContent: "center" }}>{form.hasKitchen && <CheckIcon size={11} color="white" strokeWidth={3} />}</div>
+                    <div onClick={() => set("hasKitchen", !form.hasKitchen)}
+                      style={{ width: 20, height: 20, borderRadius: 6, border: `2px solid ${form.hasKitchen ? "#2563EB" : "#CBD5E1"}`, background: form.hasKitchen ? "#2563EB" : "#fff", display: "flex", alignItems: "center", justifyContent: "center", transition: "all 0.15s" }}>
+                      {form.hasKitchen && <CheckIcon size={11} color="white" strokeWidth={3} />}
+                    </div>
                     <span style={{ fontSize: 13, color: "#334155", fontWeight: 500 }}>Kitchen area available</span>
                   </label>
                 </>
               )}
 
+              {/* Food-specific */}
               {category === "FOOD" && (
                 <>
                   <Input label="Price range" placeholder="e.g. Rs. 150–350" value={form.price} error={errors.price} onChange={(e) => set("price", e.target.value)} />
@@ -328,13 +552,17 @@ export default function Submit() {
                     <label style={{ fontSize: 12.5, fontWeight: 600, color: "#475569", display: "block", marginBottom: 8 }}>Dietary tags</label>
                     <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
                       {FOOD_TAGS.map((tag) => (
-                        <button key={tag} type="button" onClick={() => toggleTag(tag)} style={{ padding: "7px 16px", borderRadius: 20, border: `1.5px solid ${form.tags.includes(tag) ? "#16A34A" : "#E2E8F0"}`, background: form.tags.includes(tag) ? "#F0FDF4" : "#fff", fontSize: 12, fontWeight: 600, color: form.tags.includes(tag) ? "#15803D" : "#64748B", cursor: "pointer" }}>{tag}</button>
+                        <button key={tag} type="button" onClick={() => toggleTag(tag)}
+                          style={{ padding: "7px 16px", borderRadius: 20, border: `1.5px solid ${form.tags.includes(tag) ? "#16A34A" : "#E2E8F0"}`, background: form.tags.includes(tag) ? "#F0FDF4" : "#fff", fontSize: 12, fontWeight: 600, color: form.tags.includes(tag) ? "#15803D" : "#64748B", cursor: "pointer", transition: "all 0.15s" }}>
+                          {tag}
+                        </button>
                       ))}
                     </div>
                   </div>
                 </>
               )}
 
+              {/* Transport-specific */}
               {category === "TRANSPORT" && (
                 <>
                   <Input label="Route / Bus number" placeholder="e.g. 138" value={form.routeNumber} error={errors.routeNumber} onChange={(e) => set("routeNumber", e.target.value)} />
@@ -352,13 +580,16 @@ export default function Submit() {
           </div>
         )}
 
+        {/* Info Box */}
         <div style={{ background: "#EFF6FF", border: "1px solid #BFDBFE", borderRadius: 12, padding: "14px 18px", marginBottom: 20, fontSize: 12.5, color: "#1E40AF", lineHeight: 1.7 }}>
-          <strong>What happens next?</strong> Your listing will be reviewed by the campus admin within 24–48 hours.
+          <strong>What happens next?</strong> Your listing will be reviewed by the campus admin within 24–48 hours. Once approved, it will appear on the platform for all students at {user?.university || "your university"}.
         </div>
 
         <div style={{ display: "flex", gap: 12 }}>
           <Button type="button" variant="secondary" onClick={() => navigate(-1)}>Cancel</Button>
-          <Button type="submit" loading={loading} disabled={!category} style={{ flex: 1 }}>Submit for review</Button>
+          <Button type="submit" loading={loading} disabled={!category} style={{ flex: 1 }}>
+            Submit for review
+          </Button>
         </div>
       </form>
     </div>
