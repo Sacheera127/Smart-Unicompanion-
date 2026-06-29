@@ -33,3 +33,13 @@ export function Button({ children, variant = "primary", size = "md", loading = f
     const baseClasses = "inline-flex items-center justify-center font-semibold tracking-wide transition-all duration-200 ease-out active:scale-95 select-none";
     const widthClass = fullWidth ? "w-full" : "w-auto";
     const stateClass = (loading || props.disabled) ? "opacity-60 cursor-not-allowed pointer-events-none" : "cursor-pointer";
+    return (
+        <button
+            className={`${baseClasses} ${sizes[size]} ${variants[variant]} ${widthClass} ${stateClass} ${className}`}
+            disabled={props.disabled || loading}
+            {...props}
+        >
+            {loading ? <Spinner size={size === 'xs' ? 14 : size === 'sm' ? 16 : 18} /> : children}
+        </button>
+    );
+}
