@@ -43,4 +43,49 @@ export function Button({ children, variant = "primary", size = "md", loading = f
         </button>
     );
 }
+// ─── Input ────────────────────────────────────────────────────────────────────
+export function Input({ label, error, icon, hint, suffix, className = "", ...props }) {
+    const hasError = !!error;
+
+    return (
+        <div className="flex flex-col gap-1.5 w-full">
+            {label && (
+                <label className={`text-sm font-semibold transition-colors duration-200 flex items-center gap-1.5 ${hasError ? 'text-red-600' : 'text-slate-600 dark:text-slate-300'}`}>
+                    {label}
+                </label>
+            )}
+            <div className="relative w-full group">
+                {icon && (
+                    <span className={`absolute left-3.5 top-1/2 -translate-y-1/2 z-10 transition-colors duration-200 ${hasError ? 'text-red-500' : 'text-slate-400 group-focus-within:text-primary-500'}`}>
+            {icon}
+          </span>
+                )}
+                <input
+                    className={`w-full rounded-xl text-sm transition-all duration-200 outline-none
+            ${icon ? 'pl-10' : 'pl-3.5'} ${suffix ? 'pr-11' : 'pr-3.5'} py-3
+            ${hasError
+                        ? 'bg-red-50 border-2 border-red-300 text-slate-900 focus:border-red-500 focus:ring-4 focus:ring-red-100'
+                        : 'bg-slate-50 dark:bg-slate-900/50 border-2 border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100 focus:bg-white dark:focus:bg-slate-800 focus:border-primary-500 focus:ring-4 focus:ring-primary-500/20'
+                    } ${className}`}
+                    {...props}
+                />
+                {suffix && (
+                    <span className="absolute right-3.5 top-1/2 -translate-y-1/2 flex">
+            {suffix}
+          </span>
+                )}
+            </div>
+            {error && (
+                <p className="text-xs text-red-600 font-medium flex items-center gap-1 animate-slideDown">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+                        <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+                    </svg>
+                    {error}
+                </p>
+            )}
+            {hint && !error && <p className="text-xs text-slate-400">{hint}</p>}
+        </div>
+    );
+}
+
 
