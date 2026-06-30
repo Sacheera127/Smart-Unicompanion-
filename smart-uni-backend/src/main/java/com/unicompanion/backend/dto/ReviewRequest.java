@@ -11,3 +11,5 @@ public class ReviewRequest {
     public String getComment() { return comment; }
     public void setComment(String comment) { this.comment = comment; }
 }
+}
+
