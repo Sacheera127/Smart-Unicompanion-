@@ -43,6 +43,7 @@ export function Button({ children, variant = "primary", size = "md", loading = f
         </button>
     );
 }
+
 //  Input
 export function Input({ label, error, icon, hint, suffix, className = "", ...props }) {
     const hasError = !!error;
@@ -87,6 +88,7 @@ export function Input({ label, error, icon, hint, suffix, className = "", ...pro
         </div>
     );
 }
+
 // Select
 export function Select({ label, error, options = [], icon, className = "", value, onChange, ...props }) {
     const hasError = !!error;
@@ -162,6 +164,26 @@ export function Select({ label, error, options = [], icon, className = "", value
                     {error}
                 </p>
             )}
+        </div>
+    );
+}
+
+// Card
+export function Card({ children, className = "", hover = false, onClick, glass = false, style, ...props }) {
+    return (
+        <div
+            onClick={onClick}
+            className={`
+        rounded-2xl transition-all duration-300 ease-out overflow-hidden
+        ${glass ? "glass" : "bg-card border border-border shadow-sm"}
+        ${hover ? "hover:-translate-y-1 hover:shadow-glass-hover hover:border-primary-300 dark:hover:border-primary-700" : ""}
+        ${onClick ? "cursor-pointer" : ""}
+        ${className}
+      `}
+            style={style}
+            {...props}
+        >
+            {children}
         </div>
     );
 }
