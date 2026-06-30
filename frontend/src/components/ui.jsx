@@ -188,4 +188,66 @@ export function Card({ children, className = "", hover = false, onClick, glass =
     );
 }
 
+//  Badge
+export function Badge({ children, color = "blue", className = "" }) {
+    const colors = {
+        blue:   "bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-900/30 dark:text-blue-300 dark:border-blue-800",
+        green:  "bg-green-50 text-green-700 border-green-200 dark:bg-green-900/30 dark:text-green-300 dark:border-green-800",
+        orange: "bg-orange-50 text-orange-700 border-orange-200 dark:bg-orange-900/30 dark:text-orange-300 dark:border-orange-800",
+        red:    "bg-red-50 text-red-700 border-red-200 dark:bg-red-900/30 dark:text-red-300 dark:border-red-800",
+        purple: "bg-purple-50 text-purple-700 border-purple-200 dark:bg-purple-900/30 dark:text-purple-300 dark:border-purple-800",
+        gray:   "bg-slate-100 text-slate-600 border-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700",
+        yellow: "bg-yellow-50 text-yellow-700 border-yellow-200 dark:bg-yellow-900/30 dark:text-yellow-300 dark:border-yellow-800",
+    };
+    return (
+        <span className={`inline-flex items-center gap-1 text-[11px] font-bold px-2.5 py-1 rounded-full tracking-wide whitespace-nowrap border ${colors[color] || colors.blue} ${className}`}>
+      {children}
+    </span>
+    );
+}
+
+// PageHeader
+export function PageHeader({ title, subtitle, action }) {
+    return (
+        <div className="flex flex-wrap items-start justify-between mb-8 gap-4 animate-fadeInUp">
+            <div>
+                <h1 className="text-2xl font-extrabold text-slate-900 dark:text-white tracking-tight leading-tight">{title}</h1>
+                {subtitle && <p className="text-sm text-slate-500 dark:text-slate-400 mt-1.5 leading-relaxed">{subtitle}</p>}
+            </div>
+            {action && <div>{action}</div>}
+        </div>
+    );
+}
+
+//EmptyState
+export function EmptyState({ icon, title, description, action }) {
+    return (
+        <div className="flex flex-col items-center justify-center p-16 text-center gap-4 animate-fadeInUp">
+            {icon && (
+                <div className="text-slate-300 dark:text-slate-600 mb-2 animate-[float_3s_ease-in-out_infinite]">
+                    {icon}
+                </div>
+            )}
+            <h3 className="text-lg font-bold text-slate-700 dark:text-slate-200">{title}</h3>
+            {description && <p className="text-sm text-slate-400 dark:text-slate-500 max-w-[340px] leading-relaxed">{description}</p>}
+            {action && <div className="mt-4">{action}</div>}
+        </div>
+    );
+}
+
+//  LoadingScreen
+export function LoadingScreen({ message = "Loading..." }) {
+    return (
+        <div className="flex flex-col items-center justify-center h-[55vh] gap-5 animate-fadeIn">
+            <div className="relative w-14 h-14">
+                <div className="absolute inset-0 border-4 border-primary-50 dark:border-primary-900/30 rounded-full" />
+                <div className="absolute inset-0 border-4 border-transparent border-t-primary-500 rounded-full animate-spin" />
+                <div className="absolute inset-2.5 bg-primary-50 dark:bg-primary-900/30 rounded-full flex items-center justify-center">
+                    <div className="w-2.5 h-2.5 bg-primary-600 dark:bg-primary-400 rounded-full animate-pulse" />
+                </div>
+            </div>
+            <p className="text-sm font-medium text-slate-500 dark:text-slate-400">{message}</p>
+        </div>
+    );
+}
 
