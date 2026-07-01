@@ -1,13 +1,14 @@
 package com.unicompanion.backend.controller;
 
+import com.unicompanion.backend.dto.MessageResponse;
 import com.unicompanion.backend.dto.ReviewRequest;
+import com.unicompanion.backend.dto.StatusUpdateRequest;
 import com.unicompanion.backend.model.Post;
 import com.unicompanion.backend.model.Review;
 import com.unicompanion.backend.model.User;
 import com.unicompanion.backend.repository.PostRepository;
 import com.unicompanion.backend.repository.ReviewRepository;
 import com.unicompanion.backend.repository.UserRepository;
-import com.unicompanion.backend.service.FileStorageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -15,6 +16,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import com.unicompanion.backend.service.FileStorageService;
 
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
