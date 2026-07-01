@@ -1,5 +1,6 @@
 package com.unicompanion.backend.controller;
 
+import com.unicompanion.backend.dto.MessageResponse;
 import com.unicompanion.backend.model.AdminRequest;
 import com.unicompanion.backend.model.User;
 import com.unicompanion.backend.repository.AdminRequestRepository;
@@ -23,6 +24,7 @@ import java.util.Optional;
 @RestController
 @RequestMapping("/api/admin/requests")
 public class AdminRequestController {
+
     @Autowired
     AdminRequestRepository adminRequestRepository;
 
